@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle, Loader2, Download, ArrowRight, ArrowLeft, Info, BookOpen, Shield, DollarSign, Clock } from 'lucide-react';
+import { CheckCircle, Loader2, Download, ArrowRight, ArrowLeft, Info, BookOpen, DollarSign } from 'lucide-react';
 
 // Enhanced markdown to HTML converter with table and code block support
 const MarkdownText = ({ children }) => {
@@ -90,7 +90,6 @@ const AIBusinessAssessment = () => {
   const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState('');
-  const [recommendations, setRecommendations] = useState(null);
   const [showReport, setShowReport] = useState(false);
   const [contextHelp, setContextHelp] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('claude');
@@ -710,7 +709,6 @@ const AIBusinessAssessment = () => {
       }
 
       setAnalysis(data.analysis);
-      setRecommendations(parseRecommendations(data.analysis));
       setAnalysisMetadata(data.metadata);
       setShowReport(true);
     } catch (error) {
@@ -722,28 +720,6 @@ const AIBusinessAssessment = () => {
     }
   };
 
-  const parseRecommendations = (text) => {
-    const sections = {
-      approach: extractSection(text, 'SECURITY APPROACH', 'ESTIMATED COSTS'),
-      costs: extractSection(text, 'ESTIMATED COSTS', 'IMPLEMENTATION TIMELINE'),
-      timeline: extractSection(text, 'IMPLEMENTATION TIMELINE', 'VENDOR RECOMMENDATIONS'),
-      vendors: extractSection(text, 'VENDOR RECOMMENDATIONS', 'COMPLIANCE'),
-      compliance: extractSection(text, 'COMPLIANCE', 'NEXT STEPS'),
-      nextSteps: extractSection(text, 'NEXT STEPS', 'RED FLAGS'),
-      warnings: extractSection(text, 'RED FLAGS', null)
-    };
-    return sections;
-  };
-
-  const extractSection = (text, startMarker, endMarker) => {
-    const startIndex = text.indexOf(startMarker);
-    if (startIndex === -1) return '';
-
-    const contentStart = startIndex + startMarker.length;
-    const endIndex = endMarker ? text.indexOf(endMarker, contentStart) : text.length;
-
-    return text.substring(contentStart, endIndex > -1 ? endIndex : text.length).trim();
-  };
 
   const downloadPDF = () => {
     const element = document.createElement('a');
@@ -853,51 +829,8 @@ const AIBusinessAssessment = () => {
             </div>
           </div>
 
-          {recommendations && (
-            <div className="space-y-6">
-              {Object.entries(recommendations).map(([key, content]) => {
-                if (!content) return null;
-
-                const titles = {
-                  approach: 'Security Approach',
-                  costs: 'Estimated Costs',
-                  timeline: 'Implementation Timeline',
-                  vendors: 'Vendor Recommendations',
-                  compliance: 'Compliance & Risk',
-                  nextSteps: 'Next Steps',
-                  warnings: 'Red Flags'
-                };
-
-                const icons = {
-                  approach: Shield,
-                  costs: DollarSign,
-                  timeline: Clock,
-                  vendors: BookOpen,
-                  compliance: Shield,
-                  nextSteps: CheckCircle,
-                  warnings: AlertCircle
-                };
-
-                const Icon = icons[key];
-
-                return (
-                  <div key={key} className="bg-white rounded-lg shadow-lg p-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                      <Icon size={28} className="text-indigo-600" />
-                      {titles[key]}
-                    </h2>
-                    <div className="prose max-w-none text-gray-700">
-                      <MarkdownText>{content}</MarkdownText>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {!recommendations && analysis && (
+          {analysis && (
             <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Complete Analysis</h2>
               <div className="prose max-w-none text-gray-700">
                 <MarkdownText>{analysis}</MarkdownText>
               </div>
