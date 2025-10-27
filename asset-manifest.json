@@ -1,16 +1,25 @@
 {
   "files": {
-    "main.css": "/ai-assessment-tool/static/css/main.f855e6bc.css",
-    "main.js": "/ai-assessment-tool/static/js/main.f87b0019.js",
-    "static/js/453.9b291b44.chunk.js": "/ai-assessment-tool/static/js/453.9b291b44.chunk.js",
-    "static/media/logo.svg": "/ai-assessment-tool/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "main.css": "/ai-assessment-tool/static/css/main.e6c13ad2.css",
+    "main.js": "/ai-assessment-tool/static/js/main.caa1d92e.js",
+    "static/js/389.92295b05.chunk.js": "/ai-assessment-tool/static/js/389.92295b05.chunk.js",
+    "static/js/857.14ad2f3f.chunk.js": "/ai-assessment-tool/static/js/857.14ad2f3f.chunk.js",
+    "static/js/453.bd3c95c5.chunk.js": "/ai-assessment-tool/static/js/453.bd3c95c5.chunk.js",
+    "static/js/239.5322ba00.chunk.js": "/ai-assessment-tool/static/js/239.5322ba00.chunk.js",
+    "static/js/977.1d677cbb.chunk.js": "/ai-assessment-tool/static/js/977.1d677cbb.chunk.js",
+    "static/js/455.e25eafdf.chunk.js": "/ai-assessment-tool/static/js/455.e25eafdf.chunk.js",
     "index.html": "/ai-assessment-tool/index.html",
-    "main.f855e6bc.css.map": "/ai-assessment-tool/static/css/main.f855e6bc.css.map",
-    "main.f87b0019.js.map": "/ai-assessment-tool/static/js/main.f87b0019.js.map",
-    "453.9b291b44.chunk.js.map": "/ai-assessment-tool/static/js/453.9b291b44.chunk.js.map"
+    "main.e6c13ad2.css.map": "/ai-assessment-tool/static/css/main.e6c13ad2.css.map",
+    "main.caa1d92e.js.map": "/ai-assessment-tool/static/js/main.caa1d92e.js.map",
+    "389.92295b05.chunk.js.map": "/ai-assessment-tool/static/js/389.92295b05.chunk.js.map",
+    "857.14ad2f3f.chunk.js.map": "/ai-assessment-tool/static/js/857.14ad2f3f.chunk.js.map",
+    "453.bd3c95c5.chunk.js.map": "/ai-assessment-tool/static/js/453.bd3c95c5.chunk.js.map",
+    "239.5322ba00.chunk.js.map": "/ai-assessment-tool/static/js/239.5322ba00.chunk.js.map",
+    "977.1d677cbb.chunk.js.map": "/ai-assessment-tool/static/js/977.1d677cbb.chunk.js.map",
+    "455.e25eafdf.chunk.js.map": "/ai-assessment-tool/static/js/455.e25eafdf.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f855e6bc.css",
-    "static/js/main.f87b0019.js"
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.caa1d92e.js"
   ]
 }
