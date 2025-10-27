@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ai-assessment-tool/static/css/main.e6c13ad2.css",
-    "main.js": "/ai-assessment-tool/static/js/main.28b198a6.js",
+    "main.js": "/ai-assessment-tool/static/js/main.a76b5afc.js",
     "index.html": "/ai-assessment-tool/index.html",
     "main.e6c13ad2.css.map": "/ai-assessment-tool/static/css/main.e6c13ad2.css.map",
-    "main.28b198a6.js.map": "/ai-assessment-tool/static/js/main.28b198a6.js.map"
+    "main.a76b5afc.js.map": "/ai-assessment-tool/static/js/main.a76b5afc.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.28b198a6.js"
+    "static/js/main.a76b5afc.js"
   ]
 }
