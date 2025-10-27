@@ -131,7 +131,7 @@ app.post('/api/analyze', async (req, res) => {
     console.log(`Processing request with provider: ${provider} (${providerConfig.name})`);
 
     // Prepare the analysis prompt
-    const analysisPrompt = `You are an AI security and implementation consultant. Analyze this business assessment and provide specific, actionable recommendations.
+    const analysisPrompt = `You are a senior AI security and implementation consultant creating a professional enterprise strategy report. Analyze this business assessment and provide a comprehensive, well-formatted report.
 
 Business Assessment:
 ${JSON.stringify(responses, null, 2)}
@@ -142,17 +142,211 @@ CRITICAL CONTEXT:
 - These are DIFFERENT and both matter! Customer locations ADD compliance requirements.
 - AI Usage Type (ai_usage_type): Can include both "in_product" and "internal_productivity"
 
-Based on this assessment, provide a comprehensive report with:
+FORMAT YOUR REPORT AS A PROFESSIONAL ENTERPRISE STRATEGY DOCUMENT:
 
-1. SECURITY APPROACH RECOMMENDATIONS (tailored by AI usage type)
-2. ESTIMATED COSTS (breakdown by use type)
-3. IMPLEMENTATION TIMELINE (consider both types if applicable)
-4. SPECIFIC VENDOR RECOMMENDATIONS (for each usage type)
-5. COMPLIANCE & RISK ASSESSMENT (address cross-border requirements)
-6. IMMEDIATE NEXT STEPS
-7. RED FLAGS & WARNINGS
+# AI IMPLEMENTATION STRATEGY
+## Enterprise Deployment Roadmap
 
-Be specific with vendor names, cost ranges, and timelines. Address the split between business location and customer locations explicitly.`;
+**CONFIDENTIAL**
+Prepared for: [Client/Business Name based on responses]
+Date: ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+
+---
+
+## EXECUTIVE SUMMARY
+
+### Bottom Line Up Front
+Provide a 2-3 paragraph summary with:
+- Recommended strategic approach (dual-track, cloud-only, hybrid, etc.)
+- Total investment required (Year 1 and ongoing)
+- Payback period estimate
+- Key compliance coverage
+- Critical success factors (3-5 bullet points)
+
+---
+
+## 1. STRATEGIC RECOMMENDATIONS
+
+### 1.1 [Primary Recommendation Title Based on Use Case]
+
+Provide context-specific recommendations. Use ASCII diagrams where helpful:
+
+**Example Architecture Diagram** (use similar format):
+\`\`\`
+┌─────────────────┐
+│  Customer Data  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   AI Gateway    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  AI Services    │
+└─────────────────┘
+\`\`\`
+
+**Investment Model Table** (use HTML tables):
+
+<table>
+<tr><th>Cost Component</th><th>Year 1</th><th>Ongoing Annual</th><th>Notes</th></tr>
+<tr><td>AI Services</td><td>$XX,000</td><td>$XX,000</td><td>Usage-based</td></tr>
+<tr><td>Infrastructure</td><td>$XX,000</td><td>$XX,000</td><td>Cloud/gateway</td></tr>
+<tr><td>Compliance</td><td>$XX,000</td><td>$XX,000</td><td>Audits, legal</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td><td></td></tr>
+</table>
+
+### 1.2 [Secondary Recommendations if applicable]
+
+Continue with detailed sections...
+
+---
+
+## 2. COMPLIANCE & REGULATORY FRAMEWORK
+
+### 2.1 Multi-Jurisdictional Requirements
+
+**Compliance Matrix:**
+
+<table>
+<tr><th>Your Status</th><th>Customer Location</th><th>Applicable Regulations</th><th>Key Requirements</th></tr>
+<tr><td>[Location]</td><td>[Regions]</td><td>[Laws]</td><td>[Requirements]</td></tr>
+</table>
+
+### 2.2 Risk Assessment
+
+**Risk Matrix:**
+
+<table>
+<tr><th>Risk Category</th><th>Impact</th><th>Probability</th><th>Mitigation Strategy</th></tr>
+<tr><td>Data Breach</td><td>High/Med/Low</td><td>%</td><td>Specific actions</td></tr>
+</table>
+
+---
+
+## 3. IMPLEMENTATION ROADMAP
+
+### 3.1 Phased Deployment Strategy
+
+**Timeline Visualization:**
+
+\`\`\`
+Month 1-2: FOUNDATION
+├─ Week 1-2: Initial setup
+├─ Week 3-4: Configuration
+└─ Week 5-8: Testing
+   Expected ROI: XX%
+
+Month 3-4: DEPLOYMENT
+├─ Week 1-2: Pilot launch
+└─ Week 3-4: Full rollout
+\`\`\`
+
+### 3.2 Immediate Action Plan
+
+**This Week/Month breakdown with specific tasks**
+
+---
+
+## 4. VENDOR RECOMMENDATIONS
+
+**Recommended Vendor Configuration:**
+
+<table>
+<tr><th>Layer</th><th>Primary Recommendation</th><th>Alternative</th><th>Rationale</th></tr>
+<tr><td>AI Provider</td><td>[Vendor + Region]</td><td>[Alternative]</td><td>[Why]</td></tr>
+<tr><td>Security Layer</td><td>[Tool]</td><td>[Alt]</td><td>[Reason]</td></tr>
+</table>
+
+---
+
+## 5. FINANCIAL ANALYSIS
+
+### 5.1 Total Cost of Ownership (3-Year Projection)
+
+<table>
+<tr><th>Cost Category</th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>3-Year Total</th></tr>
+<tr><td>AI Services</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td></tr>
+<tr><td>Infrastructure</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td></tr>
+</table>
+
+### 5.2 Return on Investment
+
+**ROI Analysis:**
+- Break-even timeline
+- Productivity gains
+- Cost avoidance
+- Value drivers
+
+---
+
+## 6. RISK MITIGATION
+
+### 6.1 Critical Success Factors
+
+<table>
+<tr><th>Risk</th><th>Impact</th><th>Probability</th><th>Mitigation Strategy</th></tr>
+</table>
+
+### 6.2 Common Pitfalls to Avoid
+
+List critical mistakes with specific solutions
+
+---
+
+## 7. CONCLUSION
+
+### Bottom Line
+Restate key recommendations and next actions.
+
+**Recommended Next Action:**
+Specific immediate next step with budget/timeline.
+
+---
+
+## DISCLAIMER
+
+**IMPORTANT: This report is provided for informational and inspirational purposes only.**
+
+This AI implementation strategy report is a general assessment based on the information provided and should NOT be considered:
+- Legal advice or a substitute for consultation with qualified legal counsel
+- Professional cybersecurity guidance or a replacement for security audits by certified professionals
+- Compliance certification or guarantee of regulatory adherence
+- Financial advice or a substitute for consultation with financial advisors
+- A comprehensive risk assessment
+
+**You should consult with qualified professionals before making implementation decisions:**
+- **Legal Counsel**: For compliance with GDPR, HIPAA, CCPA, and other regulations
+- **Cybersecurity Experts**: For security architecture and risk assessment
+- **Compliance Specialists**: For industry-specific regulatory requirements
+- **Financial Advisors**: For budget planning and ROI analysis
+
+The strategies, costs, and timelines presented are estimates based on typical scenarios and may vary significantly based on your specific circumstances. Actual implementation should only proceed after thorough professional review and approval.
+
+**No warranty or guarantee is provided regarding the accuracy, completeness, or suitability of this report for your specific situation.**
+
+---
+
+*Report generated on ${new Date().toISOString().split('T')[0]}*
+
+---
+
+INSTRUCTIONS FOR GENERATING THIS REPORT:
+1. Use the EXACT structure above
+2. Fill in all sections with specific, actionable recommendations based on the assessment data
+3. Use HTML tables for all tabular data (they render properly)
+4. Use ASCII diagrams for architecture/flow visualizations
+5. Include specific vendor names, cost ranges ($XX,000 format), and timelines
+6. Address the business location vs customer location distinction explicitly
+7. Make tables with realistic numbers based on the user's profile
+8. Keep disclaimers prominent and clear
+9. Be specific about risks for their industry/compliance requirements
+10. Provide immediate actionable next steps
+
+Generate a complete, professional report following this structure exactly.`;
 
     let analysisText;
     let inputTokens = 0;

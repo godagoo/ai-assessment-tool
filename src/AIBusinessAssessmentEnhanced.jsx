@@ -6,29 +6,68 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, Loader2, Download, ArrowRight, ArrowLeft, Info, BookOpen, Shield, DollarSign, Clock } from 'lucide-react';
 
-// Simple markdown to HTML converter
+// Enhanced markdown to HTML converter with table and code block support
 const MarkdownText = ({ children }) => {
   if (!children) return null;
 
   const parseMarkdown = (text) => {
+    // First, extract and protect code blocks and HTML tables from processing
+    const codeBlocks = [];
+    const htmlTables = [];
+
+    // Extract code blocks (triple backticks)
+    text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
+      const index = codeBlocks.length;
+      codeBlocks.push(code.trim());
+      return `__CODEBLOCK_${index}__`;
+    });
+
+    // Extract HTML tables
+    text = text.replace(/(<table[\s\S]*?<\/table>)/gi, (match) => {
+      const index = htmlTables.length;
+      htmlTables.push(match);
+      return `__HTMLTABLE_${index}__`;
+    });
+
     // Convert markdown to HTML
     let html = text
       // Headers
-      .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
-      .replace(/## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>')
-      .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>')
+      .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2 text-gray-900">$1</h3>')
+      .replace(/## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3 text-gray-900">$1</h2>')
+      .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4 text-gray-900">$1</h1>')
+      // Horizontal rules
+      .replace(/^---$/gim, '<hr class="my-6 border-gray-300"/>')
       // Bold
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>')
       // Italic
       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
       // Bullet lists
-      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1">$1</li>')
+      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
       // Numbered lists
-      .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1">$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1 list-decimal">$1</li>')
       // Paragraphs (double newlines)
       .replace(/\n\n/g, '</p><p class="mb-4">')
       // Single line breaks
       .replace(/\n/g, '<br/>');
+
+    // Restore code blocks with styling
+    codeBlocks.forEach((code, index) => {
+      html = html.replace(
+        `__CODEBLOCK_${index}__`,
+        `<pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto my-4 border border-gray-300"><code class="text-sm font-mono text-gray-800 whitespace-pre">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
+      );
+    });
+
+    // Restore HTML tables with enhanced styling
+    htmlTables.forEach((table, index) => {
+      // Add Tailwind classes to table elements
+      const styledTable = table
+        .replace(/<table/gi, '<table class="min-w-full border-collapse border border-gray-300 my-4 text-sm"')
+        .replace(/<th/gi, '<th class="border border-gray-300 px-4 py-2 bg-indigo-100 font-bold text-left"')
+        .replace(/<td/gi, '<td class="border border-gray-300 px-4 py-2"')
+        .replace(/<tr/gi, '<tr class="hover:bg-gray-50"');
+      html = html.replace(`__HTMLTABLE_${index}__`, styledTable);
+    });
 
     // Wrap in paragraph if not starting with a tag
     if (!html.startsWith('<')) {
