@@ -27,7 +27,7 @@ jobs:
 
       - name: Create production environment file
         run: |
-          echo "REACT_APP_BACKEND_URL=https://ai-assessment-tool2.vercel.app" > .env.production.local
+          echo "REACT_APP_BACKEND_URL=https://ai-assessment-tool-omega.vercel.app" > .env.production.local
 
       - name: Build
         run: npm run build
