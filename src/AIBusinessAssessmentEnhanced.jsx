@@ -897,10 +897,6 @@ Your AI implementation strategy balances innovation, compliance, and ROI. The ph
               Generate Professional Report
               <ArrowRight className="w-6 h-6" />
             </button>
-
-            <p className="text-xs text-gray-500 mt-4">
-              Demo version - Full version includes 8-question assessment and Claude AI analysis
-            </p>
           </div>
         </div>
       </div>
