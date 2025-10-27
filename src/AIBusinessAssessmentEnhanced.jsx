@@ -29,40 +29,40 @@ const MarkdownText = ({ children }) => {
       return `__HTMLTABLE_${index}__`;
     });
 
-    // Convert markdown to HTML
+    // Convert markdown to HTML with minimal spacing for continuous flow
     let html = text
-      // Headers
-      .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2 text-gray-900">$1</h3>')
-      .replace(/## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3 text-gray-900">$1</h2>')
-      .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4 text-gray-900">$1</h1>')
-      // Remove horizontal rules to prevent visual splitting (just remove the line)
+      // Headers - no margins, just bold styling
+      .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold text-gray-900">$1</h3>')
+      .replace(/## (.*$)/gim, '<h2 class="text-xl font-bold text-gray-900">$1</h2>')
+      .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold text-gray-900">$1</h1>')
+      // Remove horizontal rules completely
       .replace(/^---$/gim, '')
       // Bold
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>')
       // Italic
       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      // Bullet lists
-      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
-      // Numbered lists
-      .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1 list-decimal">$1</li>')
-      // Paragraphs (double newlines)
-      .replace(/\n\n/g, '</p><p class="mb-4">')
+      // Bullet lists - minimal margin
+      .replace(/^\- (.*$)/gim, '<li class="ml-6 list-disc">$1</li>')
+      // Numbered lists - minimal margin
+      .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 list-decimal">$1</li>')
+      // Paragraphs - no spacing
+      .replace(/\n\n/g, '</p><p>')
       // Single line breaks
       .replace(/\n/g, '<br/>');
 
-    // Restore code blocks with styling
+    // Restore code blocks with styling - no vertical margins
     codeBlocks.forEach((code, index) => {
       html = html.replace(
         `__CODEBLOCK_${index}__`,
-        `<pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto my-4 border border-gray-300"><code class="text-sm font-mono text-gray-800 whitespace-pre">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
+        `<pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto border border-gray-300"><code class="text-sm font-mono text-gray-800 whitespace-pre">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
       );
     });
 
-    // Restore HTML tables with enhanced styling
+    // Restore HTML tables with enhanced styling - no vertical margins
     htmlTables.forEach((table, index) => {
       // Add Tailwind classes to table elements
       const styledTable = table
-        .replace(/<table/gi, '<table class="min-w-full border-collapse border border-gray-300 my-4 text-sm"')
+        .replace(/<table/gi, '<table class="min-w-full border-collapse border border-gray-300 text-sm"')
         .replace(/<th/gi, '<th class="border border-gray-300 px-4 py-2 bg-indigo-100 font-bold text-left"')
         .replace(/<td/gi, '<td class="border border-gray-300 px-4 py-2"')
         .replace(/<tr/gi, '<tr class="hover:bg-gray-50"');
@@ -71,7 +71,7 @@ const MarkdownText = ({ children }) => {
 
     // Wrap in paragraph if not starting with a tag
     if (!html.startsWith('<')) {
-      html = '<p class="mb-4">' + html + '</p>';
+      html = '<p>' + html + '</p>';
     }
 
     return html;
@@ -831,7 +831,7 @@ const AIBusinessAssessment = () => {
 
           {analysis && (
             <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="prose max-w-none text-gray-700">
+              <div className="text-gray-700">
                 <MarkdownText>{analysis}</MarkdownText>
               </div>
             </div>
