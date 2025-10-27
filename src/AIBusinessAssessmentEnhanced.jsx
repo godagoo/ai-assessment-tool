@@ -54,6 +54,12 @@ const AIBusinessAssessment = () => {
   const [recommendations, setRecommendations] = useState(null);
   const [showReport, setShowReport] = useState(false);
   const [contextHelp, setContextHelp] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState('claude');
+  const [availableProviders, setAvailableProviders] = useState([]);
+  const [analysisMetadata, setAnalysisMetadata] = useState(null);
+
+  // Get backend API URL from environment or default
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
 
   // Generate dynamic context based on previous answers
   const getQuestionContext = (questionId) => {
@@ -437,6 +443,23 @@ const AIBusinessAssessment = () => {
     }
   }, [currentStep, responses]);
 
+  // Fetch available providers on mount
+  useEffect(() => {
+    const fetchProviders = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/providers`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableProviders(data.providers.filter(p => p.available));
+          setSelectedProvider(data.default);
+        }
+      } catch (error) {
+        console.error('Failed to fetch providers:', error);
+      }
+    };
+    fetchProviders();
+  }, [BACKEND_URL]);
+
   // UPDATED QUESTIONS ARRAY - NEW ORDER WITH SPLIT LOCATION
   const questions = [
     // Q1: BUSINESS SIZE (SINGLE)
@@ -624,66 +647,37 @@ const AIBusinessAssessment = () => {
   const analyzeWithClaude = async () => {
     setLoading(true);
     try {
-      const apiKey = process.env.REACT_APP_ANTHROPIC_API_KEY;
-
-      if (!apiKey) {
-        throw new Error("API key not configured. Please set REACT_APP_ANTHROPIC_API_KEY environment variable.");
-      }
-
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      // Call secure backend proxy instead of direct API
+      const response = await fetch(`${BACKEND_URL}/api/analyze`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 4000,
-          messages: [
-            {
-              role: "user",
-              content: `You are an AI security and implementation consultant. Analyze this business assessment and provide specific, actionable recommendations.
-
-Business Assessment:
-${JSON.stringify(responses, null, 2)}
-
-CRITICAL CONTEXT:
-- Business Location (business_location): Where the company is BASED/REGISTERED
-- Customer Locations (customer_locations): Where their CUSTOMERS are located
-- These are DIFFERENT and both matter! Customer locations ADD compliance requirements.
-- AI Usage Type (ai_usage_type): Can include both "in_product" and "internal_productivity"
-
-Based on this assessment, provide a comprehensive report with:
-
-1. SECURITY APPROACH RECOMMENDATIONS (tailored by AI usage type)
-2. ESTIMATED COSTS (breakdown by use type)
-3. IMPLEMENTATION TIMELINE (consider both types if applicable)
-4. SPECIFIC VENDOR RECOMMENDATIONS (for each usage type)
-5. COMPLIANCE & RISK ASSESSMENT (address cross-border requirements)
-6. IMMEDIATE NEXT STEPS
-7. RED FLAGS & WARNINGS
-
-Be specific with vendor names, cost ranges, and timelines. Address the split between business location and customer locations explicitly.`
-            }
-          ]
+          responses,
+          provider: selectedProvider
         })
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `API error: ${response.status} ${response.statusText}`);
+        throw new Error(errorData.message || errorData.error || `Server error: ${response.status}`);
       }
 
       const data = await response.json();
-      const analysisText = data.content[0].text;
-      setAnalysis(analysisText);
-      setRecommendations(parseRecommendations(analysisText));
+
+      if (!data.success) {
+        throw new Error(data.message || 'Analysis failed');
+      }
+
+      setAnalysis(data.analysis);
+      setRecommendations(parseRecommendations(data.analysis));
+      setAnalysisMetadata(data.metadata);
       setShowReport(true);
     } catch (error) {
-      console.error("Error analyzing with Claude:", error);
-      setAnalysis(`# Error Generating Analysis\n\n${error.message}\n\nPlease check:\n- API key is configured correctly\n- You have sufficient API credits\n- Your internet connection is stable\n\nTry again or contact support if the issue persists.`);
-      setShowReport(true); // Show the error message to the user
+      console.error("Error analyzing with AI:", error);
+      setAnalysis(`# Error Generating Analysis\n\n${error.message}\n\nPlease check:\n- Backend server is running\n- You have internet connection\n- Backend has valid API keys configured\n\nIf the problem persists, contact support.`);
+      setShowReport(true);
     } finally {
       setLoading(false);
     }
@@ -758,6 +752,33 @@ Be specific with vendor names, cost ranges, and timelines. Address the split bet
                 </button>
               </div>
             </div>
+
+            {analysisMetadata && (
+              <div className="bg-green-50 border-l-4 border-green-500 rounded-r-lg p-6 mb-6">
+                <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
+                  <DollarSign size={20} />
+                  Analysis Cost & Performance
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="font-semibold text-green-700">Provider:</span>
+                    <p className="text-green-600">{analysisMetadata.provider}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-green-700">Cost:</span>
+                    <p className="text-green-600">${analysisMetadata.cost.total.toFixed(4)}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-green-700">Tokens:</span>
+                    <p className="text-green-600">{analysisMetadata.tokens.total.toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-green-700">Duration:</span>
+                    <p className="text-green-600">{(analysisMetadata.duration / 1000).toFixed(1)}s</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="bg-indigo-50 rounded-lg p-6 mb-6">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -959,6 +980,47 @@ Be specific with vendor names, cost ranges, and timelines. Address the split bet
                 </p>
               )}
             </>
+          )}
+
+          {isLastStep && availableProviders.length > 0 && (
+            <div className="mb-6 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border-2 border-indigo-200">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <DollarSign size={20} />
+                Choose AI Provider (Cost Optimization)
+              </h3>
+              <div className="space-y-3">
+                {availableProviders.map((provider) => {
+                  const estimatedCost = ((provider.costPer1M.input * 1.5 + provider.costPer1M.output * 3) / 1000).toFixed(3);
+                  const isSelected = selectedProvider === provider.id;
+
+                  return (
+                    <button
+                      key={provider.id}
+                      onClick={() => setSelectedProvider(provider.id)}
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                        isSelected
+                          ? 'border-indigo-600 bg-indigo-50 shadow-md'
+                          : 'border-gray-300 hover:border-indigo-400 hover:bg-white'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-semibold text-gray-900">{provider.name}</div>
+                          <div className="text-sm text-gray-600">{provider.model}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-green-600">~${estimatedCost}</div>
+                          <div className="text-xs text-gray-500">per analysis</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-600 mt-3">
+                All providers generate equivalent quality analysis. Choose based on your budget.
+              </p>
+            </div>
           )}
 
           <div className="flex justify-between pt-6 border-t border-gray-200">
