@@ -1,902 +1,981 @@
 /**
- * AI Business Assessment Tool - ENHANCED VERSION
- * Professional McKinsey-Style Reports with Charts & Advanced PDF
- *
- * Features:
- * - Beautiful PDF with tables, charts, and exhibits
- * - Markdown export for easy editing
- * - Professional consulting firm formatting
- * - Cost breakdown charts
- * - Implementation timeline visualization
+ * AI Business Assessment Tool - Updated Version
+ * NO ADDITIONAL DEPENDENCIES REQUIRED!
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  AlertCircle, CheckCircle, Loader2, Download, FileText,
-  ArrowRight, ArrowLeft, Info, TrendingUp, DollarSign,
-  Calendar, Shield, Users, Zap
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AlertCircle, CheckCircle, Loader2, Download, ArrowRight, ArrowLeft, Info, BookOpen, Shield, DollarSign, Clock } from 'lucide-react';
 
-// Simple Markdown Text Component
+// Simple markdown to HTML converter
 const MarkdownText = ({ children }) => {
-  return (
-    <div className="whitespace-pre-wrap leading-relaxed text-gray-700">
-      {children}
-    </div>
-  );
-};
+  if (!children) return null;
 
-// Chart Component for Cost Visualization
-const CostBreakdownChart = ({ data }) => {
-  const maxValue = Math.max(...data.map(d => d.value));
+  const parseMarkdown = (text) => {
+    // Convert markdown to HTML
+    let html = text
+      // Headers
+      .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
+      .replace(/## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>')
+      .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>')
+      // Bold
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>')
+      // Italic
+      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+      // Bullet lists
+      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1">$1</li>')
+      // Numbered lists
+      .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1">$1</li>')
+      // Paragraphs (double newlines)
+      .replace(/\n\n/g, '</p><p class="mb-4">')
+      // Single line breaks
+      .replace(/\n/g, '<br/>');
 
-  return (
-    <div className="space-y-4 p-6 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200">
-      <h3 className="font-bold text-lg text-gray-900 mb-4">Cost Breakdown Analysis</h3>
-      {data.map((item, index) => (
-        <div key={index} className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="font-medium text-gray-700">{item.label}</span>
-            <span className="font-bold text-indigo-600">€{(item.value / 1000).toFixed(1)}K</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-indigo-500 to-purple-500"
-              style={{ width: `${(item.value / maxValue) * 100}%` }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// Timeline Component
-const ImplementationTimeline = ({ phases }) => {
-  return (
-    <div className="p-6 bg-white rounded-lg border-2 border-gray-200">
-      <h3 className="font-bold text-lg text-gray-900 mb-6 flex items-center gap-2">
-        <Calendar className="w-5 h-5 text-indigo-600" />
-        Implementation Timeline
-      </h3>
-      <div className="space-y-6">
-        {phases.map((phase, index) => (
-          <div key={index} className="flex gap-4">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
-                {index + 1}
-              </div>
-              {index < phases.length - 1 && (
-                <div className="w-0.5 h-full bg-indigo-200 mt-2" />
-              )}
-            </div>
-            <div className="flex-1 pb-8">
-              <div className="flex items-center gap-2 mb-2">
-                <h4 className="font-bold text-gray-900">{phase.title}</h4>
-                <span className="text-sm text-gray-500">({phase.duration})</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">{phase.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {phase.deliverables.map((deliverable, idx) => (
-                  <span key={idx} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full">
-                    {deliverable}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Professional Table Component
-const ExhibitTable = ({ title, headers, rows, caption }) => {
-  return (
-    <div className="my-8">
-      <h4 className="font-bold text-gray-900 mb-3">{title}</h4>
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gradient-to-r from-indigo-600 to-indigo-700">
-              {headers.map((header, index) => (
-                <th key={index} className="px-4 py-3 text-left text-sm font-semibold text-white">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {rows.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} className="px-4 py-3 text-sm text-gray-700">
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {caption && (
-        <p className="text-xs text-gray-500 mt-2 italic">{caption}</p>
-      )}
-    </div>
-  );
-};
-
-// Key Metrics Cards
-const MetricCard = ({ icon: Icon, label, value, trend, color = "indigo" }) => {
-  const colorClasses = {
-    indigo: "from-indigo-500 to-indigo-600",
-    green: "from-green-500 to-green-600",
-    purple: "from-purple-500 to-purple-600",
-    blue: "from-blue-500 to-blue-600"
-  };
-
-  return (
-    <div className="bg-white rounded-xl p-6 border-2 border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`p-3 rounded-lg bg-gradient-to-br ${colorClasses[color]}`}>
-          <Icon className="w-6 h-6 text-white" />
-        </div>
-        {trend && (
-          <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
-            {trend}
-          </span>
-        )}
-      </div>
-      <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-gray-600">{label}</div>
-    </div>
-  );
-};
-
-// Enhanced Professional Report Component
-const EnhancedProfessionalReport = ({ responses, analysis, metadata }) => {
-  const reportRef = useRef(null);
-
-  // Sample data structures
-  const costData = [
-    { label: 'Customer-Facing AI', value: 30000 },
-    { label: 'Internal Productivity AI', value: 15000 },
-    { label: 'Compliance & Legal', value: 8000 },
-    { label: 'Implementation & Training', value: 5000 }
-  ];
-
-  const timelinePhases = [
-    {
-      title: "Phase 1: Internal AI Foundation",
-      duration: "Weeks 1-4",
-      description: "Deploy internal productivity tools with immediate ROI",
-      deliverables: ["M365 Copilot", "GitHub Copilot", "Training Sessions"]
-    },
-    {
-      title: "Phase 2: Compliance Setup",
-      duration: "Weeks 5-8",
-      description: "Establish legal framework and vendor agreements",
-      deliverables: ["DPAs Signed", "AI Gateway Setup", "Policy Documentation"]
-    },
-    {
-      title: "Phase 3: Customer AI Integration",
-      duration: "Weeks 9-16",
-      description: "Launch customer-facing AI capabilities",
-      deliverables: ["Beta Testing", "Full Rollout", "Monitoring Dashboard"]
+    // Wrap in paragraph if not starting with a tag
+    if (!html.startsWith('<')) {
+      html = '<p class="mb-4">' + html + '</p>';
     }
-  ];
 
-  const generateAdvancedMarkdown = () => {
-    const date = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-    return `# AI IMPLEMENTATION STRATEGY
-## Enterprise Deployment Roadmap
-
-**CONFIDENTIAL**
-Prepared for: ${metadata?.clientName || 'Your Organization'}
-Date: ${date}
-
----
-
-## 📊 KEY METRICS AT A GLANCE
-
-- **Total Year 1 Investment:** €${(costData.reduce((sum, item) => sum + item.value, 0) / 1000).toFixed(0)}K
-- **Expected ROI:** 12-15× in productivity gains
-- **Implementation Timeline:** 4 months to full deployment
-- **Compliance Coverage:** Multi-jurisdictional (GDPR, CCPA, UK GDPR)
-
----
-
-${analysis}
-
----
-
-## 💰 COST BREAKDOWN
-
-${costData.map(item => `- **${item.label}:** €${(item.value / 1000).toFixed(0)}K`).join('\n')}
-
-**Total Year 1:** €${(costData.reduce((sum, item) => sum + item.value, 0) / 1000).toFixed(0)}K
-
----
-
-## 📅 IMPLEMENTATION PHASES
-
-${timelinePhases.map((phase, idx) => `
-### Phase ${idx + 1}: ${phase.title}
-**Duration:** ${phase.duration}
-**Description:** ${phase.description}
-**Key Deliverables:** ${phase.deliverables.join(', ')}
-`).join('\n')}
-
----
-
-## 🎯 RECOMMENDED NEXT STEPS
-
-1. **Week 1:** Deploy internal productivity AI (M365 Copilot)
-2. **Week 2:** Initiate vendor negotiations for AI Gateway
-3. **Week 3:** Draft comprehensive AI governance policy
-4. **Week 4:** Begin compliance documentation process
-
----
-
-**Report prepared by AI Productivity Hub**
-**Contact:** hello@goda.go
-**Website:** [AI Productivity Hub](https://www.goda.go)
-
----
-
-*This document contains confidential and proprietary information. Not for distribution.*`;
-  };
-
-  const downloadMarkdown = () => {
-    const markdown = generateAdvancedMarkdown();
-    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `AI-Strategy-Report-${new Date().toISOString().split('T')[0]}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const downloadAdvancedPDF = async () => {
-    try {
-      const jsPDF = (await import('jspdf')).default;
-      const autoTable = (await import('jspdf-autotable')).default;
-
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 20;
-      let yPos = margin;
-
-      const addPageNumber = () => {
-        const pageCount = doc.internal.getNumberOfPages();
-        doc.setFontSize(9);
-        doc.setTextColor(150);
-        for (let i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.text(
-            `Page ${i} of ${pageCount}`,
-            pageWidth - margin,
-            pageHeight - 10,
-            { align: 'right' }
-          );
-        }
-      };
-
-      // COVER PAGE
-      doc.setFillColor(49, 46, 129);
-      doc.rect(0, 0, pageWidth, 90, 'F');
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(36);
-      doc.setFont('helvetica', 'bold');
-      doc.text('AI IMPLEMENTATION', pageWidth / 2, 35, { align: 'center' });
-      doc.text('STRATEGY', pageWidth / 2, 52, { align: 'center' });
-
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Enterprise Deployment Roadmap', pageWidth / 2, 70, { align: 'center' });
-
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(11);
-      yPos = 110;
-      doc.setFont('helvetica', 'bold');
-      doc.text('CONFIDENTIAL', margin, yPos);
-      yPos += 8;
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Prepared for: ${metadata?.clientName || 'Your Organization'}`, margin, yPos);
-      yPos += 7;
-      doc.text(`Date: ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`, margin, yPos);
-      yPos += 7;
-      doc.text(`Prepared by: AI Productivity Hub`, margin, yPos);
-
-      yPos = 145;
-      const boxWidth = (pageWidth - 3 * margin) / 2;
-      const boxHeight = 25;
-
-      doc.setFillColor(238, 242, 255);
-      doc.roundedRect(margin, yPos, boxWidth, boxHeight, 3, 3, 'F');
-      doc.setTextColor(79, 70, 229);
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text('YEAR 1 INVESTMENT', margin + 5, yPos + 8);
-      doc.setFontSize(18);
-      doc.text(`€${(costData.reduce((sum, item) => sum + item.value, 0) / 1000).toFixed(0)}K`, margin + 5, yPos + 18);
-
-      doc.setFillColor(220, 252, 231);
-      doc.roundedRect(margin + boxWidth + margin, yPos, boxWidth, boxHeight, 3, 3, 'F');
-      doc.setTextColor(22, 163, 74);
-      doc.setFontSize(9);
-      doc.text('EXPECTED ROI', margin + boxWidth + margin + 5, yPos + 8);
-      doc.setFontSize(18);
-      doc.text('12-15×', margin + boxWidth + margin + 5, yPos + 18);
-
-      yPos += boxHeight + 10;
-
-      doc.setFillColor(243, 232, 255);
-      doc.roundedRect(margin, yPos, boxWidth, boxHeight, 3, 3, 'F');
-      doc.setTextColor(147, 51, 234);
-      doc.setFontSize(9);
-      doc.text('IMPLEMENTATION', margin + 5, yPos + 8);
-      doc.setFontSize(18);
-      doc.text('4 Months', margin + 5, yPos + 18);
-
-      doc.setFillColor(219, 234, 254);
-      doc.roundedRect(margin + boxWidth + margin, yPos, boxWidth, boxHeight, 3, 3, 'F');
-      doc.setTextColor(37, 99, 235);
-      doc.setFontSize(9);
-      doc.text('COMPLIANCE', margin + boxWidth + margin + 5, yPos + 8);
-      doc.setFontSize(18);
-      doc.text('Multi-Jurisdictional', margin + boxWidth + margin + 5, yPos + 18);
-
-      // EXECUTIVE SUMMARY
-      doc.addPage();
-      yPos = margin;
-
-      doc.setFillColor(79, 70, 229);
-      doc.rect(0, yPos - 5, pageWidth, 15, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text('EXECUTIVE SUMMARY', margin, yPos + 5);
-
-      yPos += 25;
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-
-      const summaryText = analysis.substring(0, 800);
-      const lines = doc.splitTextToSize(summaryText, pageWidth - 2 * margin);
-      doc.text(lines, margin, yPos);
-
-      // COST BREAKDOWN TABLE
-      doc.addPage();
-      yPos = margin;
-
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Exhibit 1: Year 1 Investment Breakdown', margin, yPos);
-      yPos += 10;
-
-      const tableData = costData.map(item => [
-        item.label,
-        `€${(item.value / 1000).toFixed(1)}K`,
-        `${((item.value / costData.reduce((s, i) => s + i.value, 0)) * 100).toFixed(1)}%`
-      ]);
-
-      autoTable(doc, {
-        startY: yPos,
-        head: [['Cost Component', 'Amount', '% of Total']],
-        body: tableData,
-        foot: [[
-          'Total Year 1 Investment',
-          `€${(costData.reduce((sum, item) => sum + item.value, 0) / 1000).toFixed(1)}K`,
-          '100%'
-        ]],
-        theme: 'grid',
-        headStyles: {
-          fillColor: [79, 70, 229],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          fontSize: 11
-        },
-        footStyles: {
-          fillColor: [238, 242, 255],
-          textColor: [0, 0, 0],
-          fontStyle: 'bold'
-        },
-        alternateRowStyles: {
-          fillColor: [249, 250, 251]
-        },
-        margin: { left: margin, right: margin }
-      });
-
-      // TIMELINE
-      doc.addPage();
-      yPos = margin;
-
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Exhibit 2: Implementation Timeline', margin, yPos);
-      yPos += 15;
-
-      timelinePhases.forEach((phase, index) => {
-        doc.setFillColor(79, 70, 229);
-        doc.circle(margin + 5, yPos, 4, 'F');
-
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text(phase.title, margin + 15, yPos + 1);
-
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 100, 100);
-        doc.text(phase.duration, margin + 15, yPos + 7);
-
-        doc.setFontSize(10);
-        doc.setTextColor(50, 50, 50);
-        const descLines = doc.splitTextToSize(phase.description, pageWidth - margin - 30);
-        doc.text(descLines, margin + 15, yPos + 13);
-
-        yPos += 25;
-
-        if (index < timelinePhases.length - 1) {
-          doc.setDrawColor(200, 200, 200);
-          doc.setLineWidth(0.5);
-          doc.line(margin + 5, yPos - 18, margin + 5, yPos - 5);
-        }
-      });
-
-      // FOOTER
-      doc.setTextColor(150, 150, 150);
-      doc.setFontSize(8);
-      doc.text(
-        'Confidential and Proprietary – Not for Distribution',
-        pageWidth / 2,
-        pageHeight - 20,
-        { align: 'center' }
-      );
-
-      addPageNumber();
-      doc.save(`AI-Strategy-Report-${new Date().toISOString().split('T')[0]}.pdf`);
-
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('PDF generation failed. Please try again or download Markdown instead.');
-    }
+    return html;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-
-        {/* Download Action Bar */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-8 mb-8 text-white">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">🎉 Your Strategy Report is Ready!</h1>
-              <p className="text-indigo-100">
-                Professional McKinsey-style report with charts, tables, and actionable recommendations
-              </p>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={downloadAdvancedPDF}
-                className="flex items-center gap-2 bg-white text-indigo-600 px-6 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl group"
-              >
-                <FileText className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                <div className="text-left">
-                  <div>Download PDF</div>
-                  <div className="text-xs font-normal opacity-75">Professional Format</div>
-                </div>
-              </button>
-
-              <button
-                onClick={downloadMarkdown}
-                className="flex items-center gap-2 bg-indigo-800 text-white px-6 py-4 rounded-xl font-bold hover:bg-indigo-900 transition-all shadow-lg hover:shadow-xl group"
-              >
-                <Download className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                <div className="text-left">
-                  <div>Download Markdown</div>
-                  <div className="text-xs font-normal opacity-75">Editable Format</div>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Key Metrics Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <MetricCard
-            icon={DollarSign}
-            label="Year 1 Investment"
-            value={`€${(costData.reduce((sum, item) => sum + item.value, 0) / 1000).toFixed(0)}K`}
-            color="indigo"
-          />
-          <MetricCard
-            icon={TrendingUp}
-            label="Expected ROI"
-            value="12-15×"
-            trend="+380%"
-            color="green"
-          />
-          <MetricCard
-            icon={Calendar}
-            label="Implementation"
-            value="4 Months"
-            color="purple"
-          />
-          <MetricCard
-            icon={Shield}
-            label="Compliance"
-            value="Multi-Jurisdiction"
-            color="blue"
-          />
-        </div>
-
-        {/* Professional Report Preview */}
-        <div ref={reportRef} className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
-
-          {/* Report Header */}
-          <div className="bg-gradient-to-r from-gray-900 via-indigo-900 to-gray-900 text-white p-12">
-            <div className="max-w-4xl mx-auto">
-              <div className="inline-block bg-red-600 text-xs font-bold px-3 py-1 rounded-full mb-4">
-                CONFIDENTIAL
-              </div>
-              <h1 className="text-5xl font-bold mb-4">
-                AI IMPLEMENTATION STRATEGY
-              </h1>
-              <p className="text-2xl text-gray-300 mb-8">
-                Enterprise Deployment Roadmap
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-gray-400 text-xs mb-1">Prepared For</div>
-                  <div className="font-semibold">{metadata?.clientName || 'Your Organization'}</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-gray-400 text-xs mb-1">Date</div>
-                  <div className="font-semibold">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-gray-400 text-xs mb-1">Prepared By</div>
-                  <div className="font-semibold">AI Productivity Hub</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Report Body */}
-          <div className="p-8 md:p-12">
-            <div className="max-w-5xl mx-auto space-y-12">
-
-              {/* Executive Summary */}
-              <section>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-indigo-600">
-                  EXECUTIVE SUMMARY
-                </h2>
-                <div className="prose prose-lg max-w-none">
-                  <MarkdownText>{analysis.substring(0, 1200)}</MarkdownText>
-                </div>
-              </section>
-
-              {/* Cost Breakdown Visualization */}
-              <section>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-indigo-600">
-                  FINANCIAL OVERVIEW
-                </h2>
-                <CostBreakdownChart data={costData} />
-
-                <div className="mt-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-green-500 rounded-full p-3">
-                      <TrendingUp className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-green-900 mb-2">Strong ROI Projection</h3>
-                      <p className="text-green-800 text-sm">
-                        Expected productivity gains of 15-20% translate to <strong>€180K-240K annual value</strong> for a
-                        20-person team, delivering <strong>12-15× ROI</strong> within the first year.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Implementation Timeline */}
-              <section>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-indigo-600">
-                  IMPLEMENTATION ROADMAP
-                </h2>
-                <ImplementationTimeline phases={timelinePhases} />
-              </section>
-
-              {/* Vendor Recommendations */}
-              <section>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-indigo-600">
-                  VENDOR RECOMMENDATIONS
-                </h2>
-                <ExhibitTable
-                  title="Exhibit 4: Recommended Technology Stack"
-                  headers={['Category', 'Primary Solution', 'Monthly Cost', 'Purpose']}
-                  rows={[
-                    ['Customer AI', 'Azure OpenAI (EU)', '€1,500-2,000', 'GDPR-compliant customer interactions'],
-                    ['AI Gateway', 'Portkey Enterprise', '€400', 'Request routing & monitoring'],
-                    ['Internal Productivity', 'M365 Copilot', '€440 (20 users)', 'Document creation & collaboration'],
-                    ['Code Generation', 'GitHub Copilot Enterprise', '€420 (20 users)', 'Development acceleration']
-                  ]}
-                  caption="Prices shown are typical monthly costs. Actual costs may vary based on usage and contract terms."
-                />
-              </section>
-
-              {/* Full Analysis */}
-              <section>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-indigo-600">
-                  DETAILED ANALYSIS
-                </h2>
-                <div className="prose prose-lg max-w-none">
-                  <MarkdownText>{analysis}</MarkdownText>
-                </div>
-              </section>
-
-              {/* Next Steps */}
-              <section>
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border-2 border-indigo-200">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Zap className="w-8 h-8 text-indigo-600" />
-                    Recommended Next Action
-                  </h2>
-                  <p className="text-lg text-gray-700 mb-6">
-                    Approve <strong className="text-indigo-600">€15,000 immediate deployment</strong> for
-                    Microsoft 365 Copilot (Week 1) while finalizing AI Gateway vendor selection (Week 2-3).
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div className="bg-white rounded-lg p-4 border border-indigo-100">
-                      <div className="font-bold text-indigo-900 mb-1">Week 1</div>
-                      <div className="text-gray-600">Deploy internal AI tools</div>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 border border-indigo-100">
-                      <div className="font-bold text-indigo-900 mb-1">Week 2-3</div>
-                      <div className="text-gray-600">Vendor selection & contracts</div>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 border border-indigo-100">
-                      <div className="font-bold text-indigo-900 mb-1">Week 4+</div>
-                      <div className="text-gray-600">Customer AI integration</div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-            </div>
-          </div>
-
-          {/* Report Footer */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-t-2 border-gray-200 p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <h3 className="font-bold text-gray-900 mb-2">Report Prepared By</h3>
-              <p className="text-lg font-semibold text-indigo-600 mb-4">AI Productivity Hub</p>
-              <div className="flex justify-center items-center gap-6 text-sm text-gray-600">
-                <a href="mailto:hello@goda.go" className="hover:text-indigo-600 transition-colors">
-                  📧 hello@goda.go
-                </a>
-                <span className="text-gray-400">|</span>
-                <a href="https://www.goda.go" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
-                  🌐 www.goda.go
-                </a>
-              </div>
-              <p className="text-xs text-gray-500 mt-6 italic">
-                Confidential and Proprietary – Not for Distribution
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
+    <div
+      className="markdown-content"
+      dangerouslySetInnerHTML={{ __html: parseMarkdown(children) }}
+    />
   );
 };
 
-// Main App Component
-const AIBusinessAssessmentEnhanced = () => {
+const AIBusinessAssessment = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState('');
+  const [recommendations, setRecommendations] = useState(null);
   const [showReport, setShowReport] = useState(false);
+  const [contextHelp, setContextHelp] = useState('');
 
-  const generateSampleReport = () => {
-    setLoading(true);
+  // Generate dynamic context based on previous answers
+  const getQuestionContext = (questionId) => {
+    const contexts = {
+      // Q1: BUSINESS SIZE
+      company_stage: {
+        title: "🎯 Understanding Your Starting Point",
+        content: "Your company size determines your risk tolerance, budget constraints, and implementation complexity. Solopreneurs need simple, cost-effective solutions. Startups can move fast with cloud AI. Enterprises need robust security and compliance frameworks. Getting this right shapes everything that follows.",
+        learnMore: "Solo/Small: Cloud AI ($5-50K/year). Startup: Cloud with safeguards ($30-200K). SMB: Hybrid approaches ($50-500K). Enterprise: On-premise or advanced hybrid ($200K-2M+)."
+      },
 
-    // Simulate report generation
-    setTimeout(() => {
-      const sampleAnalysis = `# EXECUTIVE SUMMARY
+      // Q2: INDUSTRY
+      industry: {
+        title: "🏭 Industry-Specific Considerations",
+        content: (() => {
+          const stage = responses.company_stage;
+          if (stage === 'solo_freelance' || stage === 'startup_pre_revenue') {
+            return "Your industry choices will affect future compliance requirements. Many consultants and freelancers work across multiple industries - select all that apply. Healthcare + Education consultant? Select both. This determines which regulations might apply and helps us give more accurate guidance. It's easier to build with the right security from the start than to retrofit later.";
+          } else if (stage === 'enterprise') {
+            return "Enterprises often operate across multiple industries or serve diverse clients. Select all industries where you handle sensitive data or have compliance requirements. A healthcare company might also have financial services (payment processing) and need both HIPAA and PCI compliance. Multiple industries mean multiple regulatory frameworks - we'll help you navigate this.";
+          } else {
+            return "Select ALL industries where your business operates or where your clients are. If you're a consultant serving both healthcare and legal clients, you need to follow BOTH sets of rules. If you're in SaaS and also process payments, that's both 'SaaS/Technology' and 'Financial Services'. Multiple industries = multiple compliance considerations, but we'll help prioritize what matters most.";
+          }
+        })(),
+        learnMore: "Why multiple matters: Healthcare consultant to law firms needs HIPAA + attorney-client privilege protections. SaaS company processing payments needs SOC 2 + PCI DSS. Select all that apply to get comprehensive recommendations."
+      },
 
-## Bottom Line Up Front
-Your organization is positioned for a strategic AI implementation that balances customer-facing innovation with internal productivity gains. Recommended total Year 1 investment: €58,000.
+      // Q3: YOUR BUSINESS LOCATION (NEW - SINGLE SELECT)
+      business_location: {
+        title: "🏢 Where YOUR Business Operates",
+        content: (() => {
+          const stage = responses.company_stage;
+          const industries = responses.industry || [];
 
-## Key Findings
-• **Customer-Facing AI**: Deploy Azure OpenAI Service in EU region (€30K/year) for GDPR-compliant conversational AI
-• **Internal Productivity**: Immediate ROI through M365 Copilot and GitHub Copilot (€15K/year)
-• **Compliance Foundation**: Multi-jurisdictional framework covering GDPR, CCPA, UK GDPR (€8K setup)
-• **Expected ROI**: 12-15× return through 15-20% productivity gains across 20-person team
+          if (stage === 'solo_freelance') {
+            return "Even as a solopreneur, your location matters. This determines the BASE regulations that apply to YOU personally. US-based? You follow US laws. EU-based? GDPR applies to you by default. This is about where YOU are registered and operate from, not where your customers are (that's next question). Your location affects: 1) Which AI services you can access (some are region-restricted), 2) Your baseline compliance requirements, 3) Tax and legal structure.";
+          } else if (industries.includes('healthcare') || industries.includes('legal')) {
+            return "⚠️ CRITICAL for regulated industries: Your business location determines which regulatory bodies have jurisdiction over you. US healthcare? FDA + HHS oversight. EU healthcare? EMA + local authorities. This isn't just about data laws - it's about who regulates your business operations. Some AI services are only available in certain regions. China-based? Many US AI services are blocked. This is your PRIMARY location, where you're registered/headquartered.";
+          } else {
+            return "This is YOUR base of operations - where your company is registered and primarily operates. This determines: 1) Which data protection laws apply to YOUR operations, 2) Which AI services are accessible (some regions restrict certain providers), 3) Your baseline compliance requirements before considering customers. Next question asks about customer locations - that's separate and adds ADDITIONAL requirements. Choose ONE primary location.";
+          }
+        })(),
+        learnMore: "Key difference: YOUR location = base regulations on you. Customer locations (next Q) = additional regulations. Example: US company with EU customers must follow BOTH US + GDPR laws."
+      },
 
-## Strategic Recommendations
+      // Q4: CUSTOMER LOCATIONS (NEW - MULTI SELECT)
+      customer_locations: {
+        title: "🌍 Where Your CUSTOMERS Are (CRITICAL!)",
+        content: (() => {
+          const businessLoc = responses.business_location;
+          const stage = responses.company_stage;
+          const industries = responses.industry || [];
 
-### 1. Customer-Facing AI Strategy
-Deploy Azure OpenAI Service in EU West region with dedicated AI Gateway for compliance and cost control.
+          let warning = "";
+          if (businessLoc === 'us' || businessLoc === 'canada') {
+            warning = "⚠️ HUGE MISTAKE companies make: 'We're US-based, so we only follow US laws.' WRONG! If you have ANY EU customers, GDPR applies. If you have California customers, CCPA applies. Regulations follow your CUSTOMERS, not you. ";
+          } else if (businessLoc === 'eu' || businessLoc === 'uk') {
+            warning = "⚠️ As an EU/UK business, GDPR already applies to you. BUT if you serve US customers, you might need US state privacy laws (CCPA for California, etc.). If you serve Chinese customers, PIPL requires data to stay in China. ";
+          } else if (businessLoc === 'china') {
+            warning = "⚠️ China's PIPL has strict data localization. If you serve customers OUTSIDE China, you'll face significant restrictions on data transfers. Each region adds compliance complexity. ";
+          }
 
-**Architecture**:
-\`\`\`
-[Customer Requests] → [AI Gateway - Portkey] → [Azure OpenAI EU]
-                           ↓
-                    [Monitoring & Logs]
-                           ↓
-                    [Compliance Layer]
-\`\`\`
+          if (stage === 'startup_pre_revenue') {
+            return warning + "Even pre-revenue, WHERE you plan to get customers matters. Planning to serve EU customers? Build GDPR-compliant from day one - retrofitting is 10x harder and more expensive. Planning global? You need to design for multiple jurisdictions now. Select ALL regions where you have or plan to have customers.";
+          } else if (industries.includes('healthcare')) {
+            return warning + "Healthcare + international = complex. US patients? HIPAA. EU patients? GDPR + medical device regulations. UK patients? UK GDPR + NHS requirements. Each country can have additional healthcare data rules. This isn't optional - patient data has the strictest protections globally. Select EVERY region where you have patients/customers.";
+          } else if (industries.includes('finance')) {
+            return warning + "Financial services are HEAVILY regulated by customer location. EU customers? MiFID II + GDPR. US customers? State-by-state requirements. Chinese customers? Data must stay in China. You need to comply with regulations in EVERY region where you have customers. Payment processing adds another layer (PCI DSS). Select all customer locations.";
+          } else {
+            return warning + "This is THE question most businesses get wrong. Your business location matters, but CUSTOMER locations determine most of your compliance burden. Here's the reality: US company + EU customers = MUST comply with GDPR (€20M fines). US company + California customers = MUST comply with CCPA. Chinese customers? Data localization required. Select ALL regions where you have paying customers OR free users whose data you process.";
+          }
+        })(),
+        learnMore: "Real examples: US startup + EU customers = GDPR required (€20M or 4% revenue fines). UK company + California customers = CCPA. China customers = PIPL (data stays in China, limits AI options). Select ALL customer regions - regulations STACK."
+      },
 
-**Year 1 Costs**:
-- Azure OpenAI Service: €18,000-24,000
-- AI Gateway (Portkey Enterprise): €4,800
-- Implementation & Integration: €5,000
-- **Total**: €30,000
+      // Q5: AI USAGE TYPE (MOVED UP - MULTI SELECT)
+      ai_usage_type: {
+        title: "🎯 The CRITICAL Split Decision",
+        content: (() => {
+          const industries = responses.industry || [];
+          const customerLocs = responses.customer_locations || [];
+          const hasEU = customerLocs.includes('eu');
+          const hasChina = customerLocs.includes('china');
 
-### 2. Internal Productivity AI Strategy
-Immediate deployment of proven productivity tools with minimal compliance overhead.
+          let specificWarning = "";
+          if (industries.includes('healthcare')) {
+            specificWarning = "⚠️ HEALTHCARE ALERT: If patients interact with your AI (product AI), you need HIPAA BAA with vendors + much stricter security. If only internal staff use AI to write notes, requirements are looser. This distinction changes your costs by 10x.";
+          } else if (industries.includes('legal')) {
+            specificWarning = "⚠️ LEGAL ALERT: If clients' data goes into your AI (product), you risk privilege waiver. If only internal lawyers use AI to draft documents, it's safer. This choice is CRITICAL for legal ethics.";
+          } else if (hasEU) {
+            specificWarning = "⚠️ EU CUSTOMERS: Product AI (customer-facing) has much stricter GDPR requirements. Internal AI (employee tools) is easier. Many companies do BOTH - different security for different purposes.";
+          } else if (hasChina) {
+            specificWarning = "⚠️ CHINA CUSTOMERS: Product AI requires data to stay in China (limits AI options drastically). Internal AI for YOUR employees has more flexibility.";
+          }
 
-**Tools**:
-- Microsoft 365 Copilot (20 licenses): €6,600/year
-- GitHub Copilot Enterprise (20 developers): €5,040/year
-- Training & Change Management: €3,000
-- **Total**: €15,000
+          return specificWarning + " This is THE most important question for cost and security. Two types of AI use:\n\n🔵 PRODUCT AI: Customers directly use AI features you build. Examples: AI chatbot on your website, AI-powered search, automated customer diagnosis. Requires: Higher security, BAA agreements, GDPR compliance, can cost $100K-$2M/year.\n\n🟢 INTERNAL AI: Your employees use AI tools to work better. Examples: ChatGPT for email writing, Claude for research, Copilot for coding. Requires: Basic security, ZDR agreements, much cheaper, $5K-$50K/year.\n\nMost companies need BOTH - and that's GOOD because you use different (cheaper) solutions for internal tools. Select both if you do both.";
+        })(),
+        learnMore: "Cost difference: Product AI (customer-facing) = $100K-$2M+/year for compliance + security. Internal AI (employee tools) = $5K-$50K/year. Most companies do BOTH with different solutions - this is smart strategy, not redundant."
+      },
 
-### 3. Compliance & Legal Framework
-Establish robust multi-jurisdictional compliance covering EU, US, UK, Canada, Australia, and Brazil.
+      // Q6: USE CASES (NOW CONTEXTUAL)
+      use_cases: {
+        title: "📋 Your Specific AI Applications",
+        content: (() => {
+          const aiTypes = responses.ai_usage_type || [];
+          const hasProduct = aiTypes.includes('in_product');
+          const hasInternal = aiTypes.includes('internal_productivity');
 
-**Key Requirements**:
-- Data Processing Agreements (DPAs) with all AI vendors
-- AI-specific privacy policy updates
-- Data residency controls
-- Regular compliance audits
-- **Setup Cost**: €8,000
+          if (hasProduct && hasInternal) {
+            return "Since you selected BOTH product and internal AI, think about each use case carefully:\n\n🔵 PRODUCT Use Cases (customer-facing): Customer support chatbot, AI-powered search, automated document analysis for clients, AI features in your app.\n\n🟢 INTERNAL Use Cases (employee tools): Email writing, research assistance, code generation, report creation, data analysis.\n\nYour product use cases determine customer-facing costs and compliance. Your internal use cases can often use simpler, cheaper tools. Select all that apply from either category.";
+          } else if (hasProduct) {
+            return "🔵 You're building PRODUCT AI (customer-facing), so focus on use cases your CUSTOMERS will interact with. Each use case needs to handle customer data securely. Customer support chatbot? Needs GDPR compliance. AI-powered document analysis? Needs to protect client data. The use cases you select here determine which specific AI security measures you need and which vendors can support you. Think about what customers directly interact with.";
+          } else if (hasInternal) {
+            return "🟢 You're using AI for INTERNAL productivity (employee tools). Great! These use cases are simpler and cheaper because you control the data flow. Content creation for marketing? Low risk. Document processing for internal records? Medium risk. Code generation? Usually safe with proper tools. Select all the ways your TEAM will use AI - this is about employee productivity, not customer-facing features.";
+          } else {
+            return "Select all the ways you plan to use AI in your business. Different use cases have different security requirements. Public content creation is low risk. Processing customer data is high risk. Document analysis might involve sensitive information. We'll use your selections to recommend the right tools and security measures. Don't worry about being comprehensive - select what you know you'll do, we can adjust later.";
+          }
+        })(),
+        learnMore: "Risk levels: Content creation (LOW) → Internal documents (MEDIUM) → Customer support (HIGH) → Healthcare/Legal document processing (CRITICAL). Your use cases + data type determine security approach."
+      },
 
-## Implementation Roadmap
+      // Q7: DATA TYPES (NOW WITH SMART WARNINGS)
+      data_sensitivity: {
+        title: "🔐 Data Classification - The Foundation",
+        content: (() => {
+          const industries = responses.industry || [];
+          const aiTypes = responses.ai_usage_type || [];
+          const customerLocs = responses.customer_locations || [];
+          const hasEU = customerLocs.includes('eu');
+          const hasProduct = aiTypes.includes('in_product');
 
-### Phase 1: Internal Foundation (Weeks 1-4)
-**Quick Wins**
-- Deploy M365 Copilot to all knowledge workers (Week 1)
-- Roll out GitHub Copilot to development team (Week 2)
-- Conduct training sessions (Week 3-4)
-- **Investment**: €15,000
-- **Expected Gains**: 10-15% productivity improvement
+          let criticalWarning = "";
 
-### Phase 2: Compliance Setup (Weeks 5-8)
-**Legal Foundation**
-- Negotiate and sign DPAs with Microsoft, OpenAI, Portkey (Week 5-6)
-- Update privacy policies and terms of service (Week 7)
-- Implement data residency controls (Week 8)
-- **Investment**: €8,000
+          // Healthcare warnings
+          if (industries.includes('healthcare')) {
+            if (hasProduct) {
+              criticalWarning = "⚠️⚠️ CRITICAL: As healthcare with PRODUCT AI (customer-facing), you WILL process Protected Health Information (PHI). This means: HIPAA Business Associate Agreement required, strict access controls, audit logs, encryption at rest and in transit. Even 'just patient names' is PHI. Violations start at $100 per record with $50,000 maximum per violation. Select 'PHI' below - don't underestimate this.";
+            } else {
+              criticalWarning = "⚠️ HEALTHCARE INTERNAL USE: Even if only your staff use AI, if they're processing patient records or medical notes, that's PHI and requires HIPAA compliance. Internal use has lighter requirements than customer-facing, but PHI is PHI. Select 'PHI' if any patient data touches your AI.";
+            }
+          }
 
-### Phase 3: Customer AI Launch (Weeks 9-16)
-**Customer Innovation**
-- Configure Azure OpenAI in EU region (Week 9-10)
-- Integrate AI Gateway and monitoring (Week 11-12)
-- Beta testing with select customers (Week 13-14)
-- Full rollout and optimization (Week 15-16)
-- **Investment**: €30,000
+          // Legal warnings
+          else if (industries.includes('legal')) {
+            if (hasProduct) {
+              criticalWarning = "⚠️⚠️ CRITICAL: Legal work with PRODUCT AI means client data goes into your system. Attorney-client privilege is at stake - if not properly protected, privilege can be WAIVED. This is a career-ending risk. You need either: 1) Fully isolated AI (local/private), 2) AI vendors with attorney-client privilege protections. Select 'Attorney-Client Privileged' below - this is serious.";
+            } else {
+              criticalWarning = "⚠️ LEGAL INTERNAL USE: Lawyers using AI to draft documents or research must protect client confidentiality. While internal use is safer than client-facing tools, privileged information requires special handling. Most bar associations now have AI guidelines - check yours. Select 'Privileged' if client matters are processed.";
+            }
+          }
 
-## Financial Analysis
+          // Finance warnings
+          else if (industries.includes('finance')) {
+            criticalWarning = "⚠️ FINANCIAL SERVICES: You'll handle sensitive financial data. Credit card numbers? PCI DSS required. Bank account info? GLBA compliance. Transaction records? Still PII requiring protection. Even 'just' customer investment portfolios are sensitive. If you process payments, PCI DSS is mandatory ($5K-$50K in fines per month of non-compliance). Select all data types that apply.";
+          }
 
-### Year 1 Total Cost of Ownership (TCO)
-| Category | Cost | Notes |
-|----------|------|-------|
-| Customer-Facing AI | €30,000 | Azure OpenAI + Gateway |
-| Internal Productivity | €15,000 | M365 + GitHub Copilot |
-| Compliance & Legal | €8,000 | DPAs, policies, audits |
-| Training & Support | €5,000 | Change management |
-| **Total Year 1** | **€58,000** | Fully loaded cost |
+          // EU customer warnings
+          else if (hasEU && hasProduct) {
+            criticalWarning = "⚠️ EU CUSTOMERS + PRODUCT AI: Even basic customer data (names, emails) becomes 'personal data' under GDPR with strict requirements. Email address + IP address? That's PII under GDPR. EU regulations are strict - €20M or 4% of revenue in fines. You need proper consent, data processing agreements, and security measures. Don't underestimate 'basic' customer data with EU customers.";
+          }
 
-### ROI Calculation
-**20-person team, average loaded cost €60K/person:**
-- Total team cost: €1.2M/year
-- 15% productivity gain: €180K/year value
-- 20% productivity gain: €240K/year value
-- **ROI Range**: 12-15× in Year 1
+          return criticalWarning + "\n\nData classification is the FOUNDATION of your AI strategy. Different data types require different security approaches:\n\n🟢 PUBLIC: Marketing content, blogs, public info → ANY cloud AI works\n🟡 INTERNAL: Company documents, emails → Cloud AI with Zero Data Retention\n🟠 PII: Customer names, emails, addresses → Cloud AI with strong security OR gateway\n🔴 PHI/PRIVILEGED/FINANCIAL: Medical records, legal docs, payment data → Local AI OR highly secure cloud with BAAs\n🔴🔴 IP/TRADE SECRETS: Proprietary algorithms, competitive data → NEVER in cloud AI\n\nSelect ALL types you'll process. When in doubt, include it - better to over-protect than under-protect.";
+        })(),
+        learnMore: "Real costs by data type: PUBLIC ($0-5K/year) → INTERNAL ($5-30K) → PII ($30-100K) → PHI/LEGAL ($100-500K) → CRITICAL IP ($200K-2M). Data type = biggest cost driver."
+      },
 
-### Break-Even Analysis
-With conservative 15% productivity gains (€180K value):
-- Break-even: Month 3-4 after full deployment
-- Payback period: 3.9 months
-- Net Year 1 benefit: €122K
+      // Q8: COMPLIANCE (NOW INTELLIGENT WITH PRE-SELECTION)
+      compliance: {
+        title: "⚖️ Understanding Your Compliance Requirements",
+        content: (() => {
+          const industries = responses.industry || [];
+          const businessLoc = responses.business_location;
+          const customerLocs = responses.customer_locations || [];
+          const dataTypes = responses.data_sensitivity || [];
+          const aiTypes = responses.ai_usage_type || [];
 
-## Risk Mitigation
+          // Determine REQUIRED compliance
+          let requiredCompliance = [];
+          let recommendedCompliance = [];
+          let maybeNeeded = [];
 
-### Top 5 Risks
-1. **Data Residency Compliance**: Mitigate with EU-only Azure OpenAI deployment
-2. **Vendor Lock-in**: Use AI Gateway (Portkey) for multi-provider flexibility
-3. **User Adoption**: Address with comprehensive training program
-4. **Cost Overruns**: Control with usage monitoring and budget alerts
-5. **Security Incidents**: Implement logging, monitoring, and incident response
+          // HIPAA - REQUIRED if healthcare + PHI
+          if (industries.includes('healthcare') && dataTypes.includes('phi')) {
+            requiredCompliance.push({
+              name: 'HIPAA',
+              reason: 'Healthcare industry + processing PHI = HIPAA is MANDATORY (federal law)'
+            });
+          } else if (industries.includes('healthcare')) {
+            recommendedCompliance.push({
+              name: 'HIPAA',
+              reason: 'Healthcare industry - likely needed if you process any patient data'
+            });
+          }
 
-## Conclusion
+          // GDPR - REQUIRED if EU customers OR EU business location
+          if (customerLocs.includes('eu') || businessLoc === 'eu') {
+            requiredCompliance.push({
+              name: 'GDPR',
+              reason: customerLocs.includes('eu')
+                ? 'EU customers = GDPR applies (€20M or 4% revenue fines)'
+                : 'EU business location = GDPR applies automatically'
+            });
+          }
 
-Your AI implementation strategy balances innovation, compliance, and ROI. The phased approach allows for:
-- **Immediate value** from internal productivity tools (Month 1)
-- **Risk mitigation** through proper compliance setup (Month 2)
-- **Customer innovation** with proper guardrails (Month 3-4)
+          // UK GDPR
+          if (customerLocs.includes('uk') || businessLoc === 'uk') {
+            requiredCompliance.push({
+              name: 'UK GDPR',
+              reason: 'UK customers or UK location = UK GDPR (post-Brexit version)'
+            });
+          }
 
-**Recommended Next Action**: Approve €15,000 immediate deployment for Microsoft 365 Copilot while finalizing AI Gateway vendor selection.`;
+          // CCPA - if California customers
+          if (customerLocs.includes('us')) {
+            maybeNeeded.push({
+              name: 'CCPA/CPRA',
+              reason: 'US customers - do you have California customers? If yes, CCPA required.'
+            });
+          }
 
-      setAnalysis(sampleAnalysis);
-      setShowReport(true);
-      setLoading(false);
-    }, 2000);
+          // PCI DSS - if financial + payment data
+          if ((industries.includes('finance') || industries.includes('ecommerce')) &&
+              dataTypes.includes('financial')) {
+            requiredCompliance.push({
+              name: 'PCI DSS',
+              reason: 'Processing payment card data = PCI DSS required ($5K-$50K/month penalties)'
+            });
+          } else if (industries.includes('finance') || industries.includes('ecommerce')) {
+            maybeNeeded.push({
+              name: 'PCI DSS',
+              reason: 'Financial/ecommerce - do you process credit card data? If yes, PCI DSS required.'
+            });
+          }
+
+          // SOC 2 - if SaaS wanting enterprise sales
+          if (industries.includes('saas') || aiTypes.includes('in_product')) {
+            recommendedCompliance.push({
+              name: 'SOC 2',
+              reason: 'SaaS/Product AI - SOC 2 Type II needed to sell to enterprise customers (not legally required, but sales blocker)'
+            });
+          }
+
+          // PIPL - China
+          if (customerLocs.includes('china')) {
+            requiredCompliance.push({
+              name: 'PIPL (China)',
+              reason: 'Chinese customers = data localization required (severely limits AI options)'
+            });
+          }
+
+          // Build the contextual message
+          let message = "Based on your profile, here's what applies to YOU:\n\n";
+
+          if (requiredCompliance.length > 0) {
+            message += "✅ REQUIRED FOR YOU:\n";
+            requiredCompliance.forEach(item => {
+              message += `• ${item.name}: ${item.reason}\n`;
+            });
+            message += "\n";
+          }
+
+          if (recommendedCompliance.length > 0) {
+            message += "⚠️ STRONGLY RECOMMENDED:\n";
+            recommendedCompliance.forEach(item => {
+              message += `• ${item.name}: ${item.reason}\n`;
+            });
+            message += "\n";
+          }
+
+          if (maybeNeeded.length > 0) {
+            message += "❓ MIGHT APPLY (you decide):\n";
+            maybeNeeded.forEach(item => {
+              message += `• ${item.name}: ${item.reason}\n`;
+            });
+            message += "\n";
+          }
+
+          if (requiredCompliance.length === 0 && recommendedCompliance.length === 0) {
+            message += "Good news! Based on your selections, you might not have strict compliance requirements yet. However:\n\n";
+            message += "• If you process ANY customer personal data (names, emails), basic data protection applies\n";
+            message += "• Consider SOC 2 if you plan to sell to enterprise customers\n";
+            message += "• Select 'None' if you truly have no compliance requirements, but err on the side of caution\n\n";
+          }
+
+          message += "Select ALL that apply. We'll help you prioritize and understand costs in the report.";
+
+          return message;
+        })(),
+        learnMore: "Compliance cost ranges: HIPAA ($100-500K/year), GDPR ($30-200K), PCI DSS ($50-300K), SOC 2 ($30-150K), CCPA ($20-100K). Multiple compliance requirements STACK."
+      },
+
+      // Q9: TECHNICAL CAPABILITY
+      technical_capability: {
+        title: "🛠️ Your Technical Resources",
+        content: (() => {
+          const dataTypes = responses.data_sensitivity || [];
+          const compliance = responses.compliance || [];
+          const hasHighRisk = dataTypes.includes('phi') || dataTypes.includes('privileged') || dataTypes.includes('financial');
+          const hasStrictCompliance = compliance.includes('hipaa') || compliance.includes('pci') || compliance.includes('gdpr');
+
+          if (hasHighRisk || hasStrictCompliance) {
+            return "⚠️ IMPORTANT: Based on your data sensitivity and compliance requirements, technical capability is CRITICAL. If you selected 'No IT Team', you'll need to hire managed services or consultants - you cannot implement HIPAA or GDPR compliance alone. Budget accordingly: No IT = add $50-150K/year for managed security. Small IT = likely need outside expertise for compliance ($30-80K for initial setup). Medium+ IT = can handle with some consulting support. Don't underestimate this - technical gaps are the #1 cause of compliance failures.";
+          } else {
+            return "Your technical capability determines implementation approach. No IT? You'll want turnkey cloud solutions with minimal setup. Small IT? Cloud with some customization. Large IT/DevOps? You can handle local AI or complex hybrid setups. This also affects training time: Basic users need 2-4 weeks, technical teams can deploy in days. Be honest here - overestimating capability leads to failed projects.";
+          }
+        })(),
+        learnMore: "No IT: Cloud-only solutions, $5-50K/year, managed services. Small IT: Cloud with gateways, $30-200K. Medium IT: Hybrid possible, $50-500K. Large IT/DevOps: Any solution including on-premise, $100K-2M+."
+      },
+
+      // Q10: BUDGET
+      budget: {
+        title: "💰 Aligning Budget with Reality",
+        content: (() => {
+          const dataTypes = responses.data_sensitivity || [];
+          const compliance = responses.compliance || [];
+          const industries = responses.industry || [];
+          const aiTypes = responses.ai_usage_type || [];
+
+          const hasHighRisk = dataTypes.includes('phi') || dataTypes.includes('privileged');
+          const hasStrictCompliance = compliance.includes('hipaa') || compliance.includes('pci');
+          const hasProduct = aiTypes.includes('in_product');
+
+          if (hasHighRisk || hasStrictCompliance) {
+            return "⚠️⚠️ CRITICAL BUDGET REALITY CHECK: Based on your data sensitivity and compliance requirements, you'll need more than a basic cloud AI subscription. Let's be direct:\n\n🏥 Healthcare/Legal with Product AI: $150K-$500K first year (includes infrastructure, compliance, audits, training)\n💰 Financial services: $200K-$800K first year for hybrid setup\n\nThis isn't just software costs - it includes:\n• Secure infrastructure (cloud or local)\n• Compliance audits and legal review\n• Security assessments and penetration testing\n• Staff training and certification\n• BAA negotiations and contract reviews\n• Ongoing monitoring and updates\n\n⚠️ Underbudgeting is the #1 reason AI projects fail in regulated industries. If your budget is under $100K, you'll need to either: 1) Reduce scope (internal only, not product), 2) Delay until you have more budget, 3) Use bare-minimum solutions (risky). Be realistic.";
+          } else if (dataTypes.includes('pii') || hasProduct) {
+            return "You're handling customer PII or building product AI, so you can't just use ChatGPT directly. Good news: You don't necessarily need expensive on-premise solutions.\n\nRealistic budget ranges:\n• Basic Product AI with PII: $30-100K/year\n• Internal AI with customer data: $10-50K/year\n• Both product + internal: $50-200K/year\n\nThis includes:\n• AI service costs (cloud with Zero Data Retention OR gateway)\n• Security tools and monitoring\n• Integration and development work\n• Team training (don't skip this!)\n• Legal review of vendor contracts\n\nDon't lowball - data breaches cost $4.5M average, plus reputation damage.";
+          } else {
+            return "Without highly sensitive data or strict compliance, you have flexibility! Cloud AI is cost-effective and fast to implement.\n\nBudget guidance:\n• Solo/Small: $5-20K/year (basic cloud tools)\n• Startup/SMB: $20-100K/year (cloud + some security)\n• Enterprise: $100-500K+ (depends on scale)\n\nInclude these costs:\n• AI service subscriptions ($5-50K)\n• Training for your team ($5-20K) - DON'T SKIP\n• Integration work ($10-50K)\n• Monitoring and management ($5-20K)\n\nMost companies underspend on training and overspend on tools. Start small, prove ROI, then scale up.";
+          }
+        })(),
+        learnMore: "Budget breakdown: Software (30-40%), Infrastructure (20-30%), Training (10-15%), Compliance/Legal (15-25%), Ongoing support (10-20%). First year is always more expensive than ongoing."
+      },
+
+      // Q11: TIMELINE
+      timeline: {
+        title: "⏱️ Implementation Timeline Reality Check",
+        content: (() => {
+          const compliance = responses.compliance || [];
+          const dataTypes = responses.data_sensitivity || [];
+          const techCapability = responses.technical_capability || '';
+          const aiTypes = responses.ai_usage_type || [];
+
+          const hasStrictCompliance = compliance.includes('hipaa') || compliance.includes('pci') || compliance.includes('gdpr');
+          const hasHighRisk = dataTypes.includes('phi') || dataTypes.includes('privileged');
+          const lowTech = techCapability === 'no_it' || techCapability === 'small_it';
+          const hasProduct = aiTypes.includes('in_product');
+
+          let timelineGuidance = "";
+
+          if (hasStrictCompliance && hasHighRisk && hasProduct) {
+            timelineGuidance = "⚠️⚠️ REALITY CHECK: You have strict compliance + sensitive data + product AI. This combination CANNOT be rushed safely.\n\n❌ 1-4 weeks: IMPOSSIBLE - don't even try\n⚠️ 1-3 months: Only possible for internal tools, NOT product AI\n✅ 3-6 months: Minimum realistic timeline for compliant product AI\n✅✅ 6-12 months: RECOMMENDED for proper implementation\n\nWhy it takes time:\n• Legal review: 2-4 weeks\n• Security architecture design: 3-6 weeks\n• Infrastructure setup: 4-8 weeks\n• Compliance audits: 4-6 weeks\n• Testing and validation: 3-4 weeks\n• Staff training: 2-4 weeks\n\nRushing healthcare/legal AI leads to violations and lawsuits. Take the time to do it right.";
+          } else if (hasStrictCompliance || hasHighRisk) {
+            timelineGuidance = "⚠️ With compliance requirements or sensitive data, you need time for proper setup:\n\n❌ 1-4 weeks: Too fast for compliant implementation\n⚠️ 1-3 months: Possible for internal tools, rushed for product AI\n✅ 3-6 months: Good timeline for most implementations\n✅ 6-12 months: Ideal for complex setups\n\nKey phases:\n• Requirements + vendor selection: 3-4 weeks\n• Legal/compliance review: 2-4 weeks\n• Infrastructure setup: 4-8 weeks\n• Testing: 2-4 weeks\n• Training + rollout: 2-3 weeks\n\nYou CAN move faster for internal tools, slower for customer-facing features.";
+          } else if (lowTech) {
+            timelineGuidance = "Limited technical resources means you'll want managed solutions:\n\n✅ 1-4 weeks: Possible for basic cloud tools (internal use)\n✅ 1-3 months: Typical for cloud AI with good vendors\n⚠️ 3-6+ months: If you need custom integration\n\nWith limited IT, your timeline depends on vendor selection. Turnkey solutions like Microsoft 365 Copilot can deploy in days. Custom implementations take months. Choose based on your urgency vs control needs.";
+          } else if (hasProduct) {
+            timelineGuidance = "Product AI (customer-facing) requires careful rollout:\n\n⚠️ 1-4 weeks: Only for MVP/beta with limited users\n✅ 1-3 months: Good for startup product features\n✅ 3-6 months: Standard for SMB/enterprise products\n✅ 6-12 months: If extensive integration needed\n\nProduct AI can't be rushed because:\n• Customer-facing bugs damage reputation\n• Need thorough testing with real scenarios\n• Requires user acceptance testing\n• Must monitor performance closely\n\nYou can deploy internal AI much faster than product AI.";
+          } else {
+            timelineGuidance = "Internal AI tools (employee productivity) can move faster:\n\n✅ 1-4 weeks: Possible for basic cloud tools (ChatGPT, Claude)\n✅ 1-3 months: Standard for company-wide rollout\n⚠️ 3-6 months: If extensive training or integration needed\n✅ 6-12 months: For complex custom solutions\n\nInternal tools are lower risk, so you can pilot quickly:\n• Week 1-2: Pilot with 5-10 users\n• Week 3-4: Expand to department\n• Month 2-3: Company-wide rollout\n• Ongoing: Optimize and add features\n\nStart fast with cloud tools, prove value, then decide if you need more.";
+          }
+
+          return timelineGuidance;
+        })(),
+        learnMore: "Timeline factors: Compliance adds 2-4 months. Custom integration adds 1-3 months. Limited IT adds 1-2 months. Multiple locations adds 1-2 months. Product AI adds 2-6 months vs internal tools."
+      }
+    };
+
+    return contexts[questionId] || {
+      title: "ℹ️ Context Help",
+      content: "This helps us understand your specific situation better.",
+      learnMore: ""
+    };
   };
 
-  if (showReport && analysis) {
-    return <EnhancedProfessionalReport
-      responses={{}}
-      analysis={analysis}
-      metadata={{ clientName: 'Your Organization' }}
-    />;
-  }
+  // Effect to update context when step changes
+  useEffect(() => {
+    const currentQuestion = questions[currentStep];
+    if (currentQuestion) {
+      const context = getQuestionContext(currentQuestion.id);
+      setContextHelp(context);
+    }
+  }, [currentStep, responses]);
 
-  if (loading) {
+  // UPDATED QUESTIONS ARRAY - NEW ORDER WITH SPLIT LOCATION
+  const questions = [
+    // Q1: BUSINESS SIZE (SINGLE)
+    {
+      id: 'company_stage',
+      question: 'What is your business size?',
+      type: 'single',
+      options: [
+        { value: 'solo_freelance', label: 'Solo/Freelancer', description: '1 person, minimal budget' },
+        { value: 'startup_pre_revenue', label: 'Startup (Pre-revenue)', description: 'Building product, no customers yet' },
+        { value: 'startup_seed', label: 'Startup (Seed/Series A)', description: 'Early customers, <50 employees' },
+        { value: 'smb', label: 'SMB (Small-Medium Business)', description: '50-500 employees' },
+        { value: 'enterprise', label: 'Enterprise', description: '500+ employees' }
+      ]
+    },
+
+    // Q2: INDUSTRY (MULTI - NEW!)
+    {
+      id: 'industry',
+      question: 'What industry/industries do you operate in? (Select all that apply)',
+      type: 'multiple',
+      options: [
+        { value: 'healthcare', label: 'Healthcare', description: 'Medical, dental, mental health, therapy' },
+        { value: 'legal', label: 'Legal', description: 'Law firms, legal services, attorney work' },
+        { value: 'finance', label: 'Financial Services', description: 'Banking, fintech, investment, accounting' },
+        { value: 'saas', label: 'SaaS/Technology', description: 'Software, tech services, IT' },
+        { value: 'ecommerce', label: 'E-commerce/Retail', description: 'Online or retail sales' },
+        { value: 'education', label: 'Education', description: 'Schools, training, educational services' },
+        { value: 'consulting', label: 'Consulting', description: 'Business consulting, advisory services' },
+        { value: 'other', label: 'Other', description: 'Other industry' }
+      ]
+    },
+
+    // Q3: YOUR BUSINESS LOCATION (SINGLE - NEW!)
+    {
+      id: 'business_location',
+      question: 'Where is YOUR business primarily based/registered?',
+      type: 'single',
+      options: [
+        { value: 'us', label: 'United States', description: 'US-based company/sole proprietor' },
+        { value: 'eu', label: 'European Union', description: 'EU-based business (any EU country)' },
+        { value: 'uk', label: 'United Kingdom', description: 'UK-based business (post-Brexit)' },
+        { value: 'canada', label: 'Canada', description: 'Canadian business' },
+        { value: 'australia', label: 'Australia/New Zealand', description: 'AU/NZ based business' },
+        { value: 'china', label: 'China', description: 'China-based business' },
+        { value: 'latam', label: 'Latin America', description: 'Based in LATAM (Brazil, Mexico, etc.)' },
+        { value: 'other', label: 'Other', description: 'Other country/region' }
+      ]
+    },
+
+    // Q4: CUSTOMER LOCATIONS (MULTI - NEW!)
+    {
+      id: 'customer_locations',
+      question: 'Where are your CUSTOMERS located? (Select ALL regions where you have customers)',
+      type: 'multiple',
+      options: [
+        { value: 'us', label: 'United States', description: 'US customers (triggers state laws like CCPA)' },
+        { value: 'eu', label: 'European Union', description: 'EU customers (triggers GDPR - €20M fines)' },
+        { value: 'uk', label: 'United Kingdom', description: 'UK customers (UK GDPR post-Brexit)' },
+        { value: 'canada', label: 'Canada', description: 'Canadian customers (PIPEDA)' },
+        { value: 'australia', label: 'Australia/New Zealand', description: 'AU/NZ customers (Privacy Act)' },
+        { value: 'china', label: 'China', description: 'Chinese customers (PIPL - data localization!)' },
+        { value: 'latam', label: 'Latin America', description: 'LATAM customers (LGPD in Brazil, etc.)' },
+        { value: 'global', label: 'Global/Worldwide', description: 'Customers in many regions' }
+      ]
+    },
+
+    // Q5: AI USAGE TYPE (MOVED UP, MULTI)
+    {
+      id: 'ai_usage_type',
+      question: 'How will AI be used in your business? (Select all that apply)',
+      type: 'multiple',
+      options: [
+        { value: 'in_product', label: '🔵 In Our Product/Service (Customer-Facing)', description: 'AI features that customers directly interact with - chatbots, AI search, automated analysis in your app' },
+        { value: 'internal_productivity', label: '🟢 Internal Team Productivity (Employee Tools)', description: 'Employees using AI to work better - writing, research, coding, data analysis' }
+      ]
+    },
+
+    // Q6: USE CASES (MULTI)
+    {
+      id: 'use_cases',
+      question: 'What specific AI use cases do you have? (Select all that apply)',
+      type: 'multiple',
+      options: [
+        { value: 'content', label: 'Content Creation', description: 'Marketing, writing, social media, blogs' },
+        { value: 'customer_support', label: 'Customer Support', description: 'Chatbots, ticket responses, FAQ automation' },
+        { value: 'data_analysis', label: 'Data Analysis', description: 'Reports, insights, analytics, dashboards' },
+        { value: 'document_processing', label: 'Document Processing', description: 'Contracts, forms, records, document review' },
+        { value: 'coding', label: 'Code Generation', description: 'Development assistance, code review, debugging' },
+        { value: 'research', label: 'Research & Analysis', description: 'Market research, competitive intelligence' },
+        { value: 'automation', label: 'Process Automation', description: 'Workflows, repetitive tasks, data entry' },
+        { value: 'training', label: 'Training & Education', description: 'Employee training, learning materials' }
+      ]
+    },
+
+    // Q7: DATA TYPES (MULTI)
+    {
+      id: 'data_sensitivity',
+      question: 'What type of data will AI process? (Select all that apply)',
+      type: 'multiple',
+      options: [
+        { value: 'public', label: 'Public/Marketing Content', description: 'Blog posts, social media, public-facing content' },
+        { value: 'internal', label: 'Internal Business Data', description: 'Company documents, emails, internal reports' },
+        { value: 'pii', label: 'Customer PII', description: 'Names, emails, addresses, phone numbers' },
+        { value: 'phi', label: 'Protected Health Info (PHI)', description: 'Medical records, patient data, health information' },
+        { value: 'privileged', label: 'Attorney-Client Privileged', description: 'Legal documents, case files, client communications' },
+        { value: 'financial', label: 'Financial/Payment Data', description: 'Bank accounts, credit cards, transactions' },
+        { value: 'ip', label: 'Trade Secrets/IP', description: 'Proprietary algorithms, formulas, competitive data' }
+      ]
+    },
+
+    // Q8: COMPLIANCE (MULTI - NOW INTELLIGENT)
+    {
+      id: 'compliance',
+      question: 'What compliance requirements apply to you? (We\'ve pre-identified some based on your profile)',
+      type: 'multiple',
+      options: [
+        { value: 'none', label: 'None', description: 'No specific compliance requirements' },
+        { value: 'hipaa', label: 'HIPAA', description: 'US healthcare data protection (PHI)' },
+        { value: 'gdpr', label: 'GDPR', description: 'EU data protection (€20M or 4% revenue fines)' },
+        { value: 'uk_gdpr', label: 'UK GDPR', description: 'UK data protection (post-Brexit)' },
+        { value: 'pci', label: 'PCI DSS', description: 'Payment card data security' },
+        { value: 'soc2', label: 'SOC 2', description: 'Service organization controls (enterprise sales)' },
+        { value: 'ccpa', label: 'CCPA/CPRA', description: 'California privacy law' },
+        { value: 'pipl', label: 'PIPL', description: 'China data localization' },
+        { value: 'other', label: 'Other regulations', description: 'Industry-specific or regional' }
+      ]
+    },
+
+    // Q9: TECHNICAL CAPABILITY (SINGLE)
+    {
+      id: 'technical_capability',
+      question: 'What is your technical capability?',
+      type: 'single',
+      options: [
+        { value: 'no_it', label: 'No IT Team', description: 'No dedicated technical staff - need turnkey solutions' },
+        { value: 'small_it', label: 'Small IT (1-2 people)', description: 'Limited technical resources' },
+        { value: 'medium_it', label: 'Medium IT (3-10 people)', description: 'Moderate technical capability' },
+        { value: 'large_it', label: 'Large IT (10+ people)', description: 'Strong technical team' },
+        { value: 'devops', label: 'Advanced DevOps/Engineering', description: 'Expert technical capabilities' }
+      ]
+    },
+
+    // Q10: BUDGET (SINGLE)
+    {
+      id: 'budget',
+      question: 'What is your annual AI budget?',
+      type: 'single',
+      options: [
+        { value: 'under_10k', label: 'Under $10,000', description: 'Very limited budget, basic cloud tools only' },
+        { value: '10k_50k', label: '$10,000 - $50,000', description: 'Small budget, cloud solutions' },
+        { value: '50k_200k', label: '$50,000 - $200,000', description: 'Medium budget, cloud + security' },
+        { value: '200k_500k', label: '$200,000 - $500,000', description: 'Large budget, hybrid options' },
+        { value: 'over_500k', label: 'Over $500,000', description: 'Enterprise budget, any solution' }
+      ]
+    },
+
+    // Q11: TIMELINE (SINGLE)
+    {
+      id: 'timeline',
+      question: 'What is your implementation timeline?',
+      type: 'single',
+      options: [
+        { value: 'urgent', label: 'Urgent (1-4 weeks)', description: 'Need to start immediately, accepting limitations' },
+        { value: 'fast', label: 'Fast (1-3 months)', description: 'Want to move quickly but properly' },
+        { value: 'moderate', label: 'Moderate (3-6 months)', description: 'Standard timeline, balanced approach' },
+        { value: 'patient', label: 'Patient (6-12 months)', description: 'Can take time to do it perfectly' }
+      ]
+    }
+  ];
+
+  const handleResponse = (questionId, value, isMultiple = false) => {
+    setResponses(prev => {
+      if (isMultiple) {
+        const current = prev[questionId] || [];
+        if (current.includes(value)) {
+          return { ...prev, [questionId]: current.filter(v => v !== value) };
+        }
+        return { ...prev, [questionId]: [...current, value] };
+      }
+      return { ...prev, [questionId]: value };
+    });
+  };
+
+  const analyzeWithClaude = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 4000,
+          messages: [
+            {
+              role: "user",
+              content: `You are an AI security and implementation consultant. Analyze this business assessment and provide specific, actionable recommendations.
+
+Business Assessment:
+${JSON.stringify(responses, null, 2)}
+
+CRITICAL CONTEXT:
+- Business Location (business_location): Where the company is BASED/REGISTERED
+- Customer Locations (customer_locations): Where their CUSTOMERS are located
+- These are DIFFERENT and both matter! Customer locations ADD compliance requirements.
+- AI Usage Type (ai_usage_type): Can include both "in_product" and "internal_productivity"
+
+Based on this assessment, provide a comprehensive report with:
+
+1. SECURITY APPROACH RECOMMENDATIONS (tailored by AI usage type)
+2. ESTIMATED COSTS (breakdown by use type)
+3. IMPLEMENTATION TIMELINE (consider both types if applicable)
+4. SPECIFIC VENDOR RECOMMENDATIONS (for each usage type)
+5. COMPLIANCE & RISK ASSESSMENT (address cross-border requirements)
+6. IMMEDIATE NEXT STEPS
+7. RED FLAGS & WARNINGS
+
+Be specific with vendor names, cost ranges, and timelines. Address the split between business location and customer locations explicitly.`
+            }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      const analysisText = data.content[0].text;
+      setAnalysis(analysisText);
+      setRecommendations(parseRecommendations(analysisText));
+      setShowReport(true);
+    } catch (error) {
+      console.error("Error analyzing with Claude:", error);
+      setAnalysis("Error generating analysis. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const parseRecommendations = (text) => {
+    const sections = {
+      approach: extractSection(text, 'SECURITY APPROACH', 'ESTIMATED COSTS'),
+      costs: extractSection(text, 'ESTIMATED COSTS', 'IMPLEMENTATION TIMELINE'),
+      timeline: extractSection(text, 'IMPLEMENTATION TIMELINE', 'VENDOR RECOMMENDATIONS'),
+      vendors: extractSection(text, 'VENDOR RECOMMENDATIONS', 'COMPLIANCE'),
+      compliance: extractSection(text, 'COMPLIANCE', 'NEXT STEPS'),
+      nextSteps: extractSection(text, 'NEXT STEPS', 'RED FLAGS'),
+      warnings: extractSection(text, 'RED FLAGS', null)
+    };
+    return sections;
+  };
+
+  const extractSection = (text, startMarker, endMarker) => {
+    const startIndex = text.indexOf(startMarker);
+    if (startIndex === -1) return '';
+
+    const contentStart = startIndex + startMarker.length;
+    const endIndex = endMarker ? text.indexOf(endMarker, contentStart) : text.length;
+
+    return text.substring(contentStart, endIndex > -1 ? endIndex : text.length).trim();
+  };
+
+  const downloadPDF = () => {
+    const element = document.createElement('a');
+    const file = new Blob([analysis], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'ai-implementation-report.txt';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const currentQuestion = questions[currentStep];
+  const isLastStep = currentStep === questions.length - 1;
+
+  const currentResponse = responses[currentQuestion?.id];
+  const canProceed = currentQuestion?.type === 'multiple'
+    ? currentResponse && currentResponse.length > 0
+    : currentResponse !== undefined;
+
+  if (showReport) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Crafting Your Strategy Report...</h2>
-          <p className="text-gray-600 mb-2">Analyzing responses and generating recommendations</p>
-          <p className="text-sm text-gray-500">This takes 30-60 seconds</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-lg shadow-xl p-8 mb-6">
+            <div className="text-center mb-6">
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">Your AI Implementation Report</h1>
+              <p className="text-gray-600">Personalized recommendations based on your business profile</p>
+              <div className="mt-4 flex justify-center gap-4">
+                <button
+                  onClick={downloadPDF}
+                  className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-lg"
+                >
+                  <Download size={20} />
+                  Download Report
+                </button>
+                <button
+                  onClick={() => {
+                    setShowReport(false);
+                    setCurrentStep(0);
+                    setResponses({});
+                  }}
+                  className="flex items-center gap-2 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                >
+                  Start New Assessment
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-indigo-50 rounded-lg p-6 mb-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BookOpen size={20} />
+                Your Business Profile
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-semibold text-gray-700">Business Size:</span>
+                  <p className="text-gray-600">{responses.company_stage}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Industries:</span>
+                  <p className="text-gray-600">{Array.isArray(responses.industry) ? responses.industry.join(', ') : responses.industry}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Business Location:</span>
+                  <p className="text-gray-600">{responses.business_location}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Customer Locations:</span>
+                  <p className="text-gray-600">{responses.customer_locations?.join(', ')}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-700">AI Usage:</span>
+                  <p className="text-gray-600">{responses.ai_usage_type?.join(', ')}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Budget Range:</span>
+                  <p className="text-gray-600">{responses.budget}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {recommendations && (
+            <div className="space-y-6">
+              {Object.entries(recommendations).map(([key, content]) => {
+                if (!content) return null;
+
+                const titles = {
+                  approach: 'Security Approach',
+                  costs: 'Estimated Costs',
+                  timeline: 'Implementation Timeline',
+                  vendors: 'Vendor Recommendations',
+                  compliance: 'Compliance & Risk',
+                  nextSteps: 'Next Steps',
+                  warnings: 'Red Flags'
+                };
+
+                const icons = {
+                  approach: Shield,
+                  costs: DollarSign,
+                  timeline: Clock,
+                  vendors: BookOpen,
+                  compliance: Shield,
+                  nextSteps: CheckCircle,
+                  warnings: AlertCircle
+                };
+
+                const Icon = icons[key];
+
+                return (
+                  <div key={key} className="bg-white rounded-lg shadow-lg p-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                      <Icon size={28} className="text-indigo-600" />
+                      {titles[key]}
+                    </h2>
+                    <div className="prose max-w-none text-gray-700">
+                      <MarkdownText>{content}</MarkdownText>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {!recommendations && analysis && (
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Complete Analysis</h2>
+              <div className="prose max-w-none text-gray-700">
+                <MarkdownText>{analysis}</MarkdownText>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">AI Strategy Assessment</h1>
-          <p className="text-xl text-gray-600 mb-8">Get your professional McKinsey-style report in minutes</p>
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-gray-900 mb-3">AI Business Assessment Tool</h1>
+          <p className="text-xl text-gray-600">Get personalized recommendations for implementing AI in your business</p>
+        </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-xl border-2 border-indigo-100">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center">
-                <div className="text-4xl mb-2">📊</div>
-                <h3 className="font-bold text-gray-900 mb-1">Professional Format</h3>
-                <p className="text-sm text-gray-600">McKinsey-style report with exhibits</p>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl mb-2">💰</div>
-                <h3 className="font-bold text-gray-900 mb-1">Financial Analysis</h3>
-                <p className="text-sm text-gray-600">ROI calculations & TCO breakdown</p>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl mb-2">🚀</div>
-                <h3 className="font-bold text-gray-900 mb-1">Action Plan</h3>
-                <p className="text-sm text-gray-600">Week-by-week implementation roadmap</p>
-              </div>
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-700">
+              Question {currentStep + 1} of {questions.length}
+            </span>
+            <span className="text-sm font-medium text-gray-700">
+              {Math.round(((currentStep + 1) / questions.length) * 100)}% Complete
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-xl p-8 mb-6">
+          {loading ? (
+            <div className="text-center py-12">
+              <Loader2 className="animate-spin mx-auto mb-4 text-indigo-600" size={48} />
+              <p className="text-xl font-medium text-gray-700">Analyzing your responses with Claude AI...</p>
+              <p className="text-sm text-gray-500 mt-2">This will take about 30-60 seconds</p>
             </div>
+          ) : (
+            <>
+              <div className="mb-8">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="bg-indigo-100 rounded-full p-3 flex-shrink-0">
+                    <span className="text-2xl font-bold text-indigo-700">{currentStep + 1}</span>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                      {currentQuestion.question}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {currentQuestion.type === 'multiple'
+                        ? '📋 Select all that apply'
+                        : '🎯 Select one option'}
+                    </p>
+                  </div>
+                </div>
 
+                {contextHelp && (
+                  <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-lg p-5 mt-4">
+                    <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                      <Info size={20} />
+                      {contextHelp.title}
+                    </h3>
+                    <p className="text-sm text-blue-800 leading-relaxed mb-3">{contextHelp.content}</p>
+                    {contextHelp.learnMore && (
+                      <details className="text-sm">
+                        <summary className="cursor-pointer font-semibold text-blue-700 hover:text-blue-900">
+                          💡 Learn more...
+                        </summary>
+                        <p className="mt-2 text-blue-700 pl-4 border-l-2 border-blue-300">
+                          {contextHelp.learnMore}
+                        </p>
+                      </details>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 mb-8">
+                {currentQuestion.options.map((option) => {
+                  const isSelected = currentQuestion.type === 'multiple'
+                    ? (responses[currentQuestion.id] || []).includes(option.value)
+                    : responses[currentQuestion.id] === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => handleResponse(currentQuestion.id, option.value, currentQuestion.type === 'multiple')}
+                      className={`w-full text-left p-5 rounded-lg border-2 transition-all duration-200 ${
+                        isSelected
+                          ? 'border-indigo-600 bg-indigo-50 shadow-md'
+                          : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'
+                        }`}>
+                          {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-semibold text-gray-900 mb-1">{option.label}</div>
+                          <div className="text-sm text-gray-600">{option.description}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {currentQuestion.type === 'multiple' && (
+                <p className="text-sm text-gray-500 mt-4 flex items-center gap-2">
+                  <Info size={16} />
+                  Select all that apply - you can choose multiple options
+                </p>
+              )}
+            </>
+          )}
+
+          <div className="flex justify-between pt-6 border-t border-gray-200">
             <button
-              onClick={generateSampleReport}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg"
+              onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
+              disabled={currentStep === 0}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 hover:bg-gray-100"
             >
-              <FileText className="w-6 h-6" />
-              Generate Professional Report
-              <ArrowRight className="w-6 h-6" />
+              <ArrowLeft size={20} />
+              Previous
             </button>
+
+            {isLastStep ? (
+              <button
+                onClick={analyzeWithClaude}
+                disabled={!canProceed}
+                className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              >
+                Generate My Report
+                <ArrowRight size={20} />
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrentStep(prev => prev + 1)}
+                disabled={!canProceed}
+                className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+                <ArrowRight size={20} />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -904,4 +983,4 @@ Your AI implementation strategy balances innovation, compliance, and ROI. The ph
   );
 };
 
-export default AIBusinessAssessmentEnhanced;
+export default AIBusinessAssessment;
