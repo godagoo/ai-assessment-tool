@@ -18,6 +18,22 @@ Professional McKinsey-style AI implementation reports with beautiful charts, tab
 
 ## 🚀 Quick Start
 
+### Environment Setup
+
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Get your Anthropic Claude API key from [https://console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys)
+
+3. Add your API key to `.env`:
+```
+REACT_APP_ANTHROPIC_API_KEY=sk-ant-api03-your-actual-api-key-here
+```
+
+**Security Note:** The API key will be embedded in the client-side bundle. For production use, consider implementing a backend proxy to keep the API key secure.
+
 ### Run Locally
 
 ```bash

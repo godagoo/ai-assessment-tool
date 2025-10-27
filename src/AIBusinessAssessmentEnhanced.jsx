@@ -624,10 +624,18 @@ const AIBusinessAssessment = () => {
   const analyzeWithClaude = async () => {
     setLoading(true);
     try {
+      const apiKey = process.env.REACT_APP_ANTHROPIC_API_KEY;
+
+      if (!apiKey) {
+        throw new Error("API key not configured. Please set REACT_APP_ANTHROPIC_API_KEY environment variable.");
+      }
+
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01"
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
@@ -662,6 +670,11 @@ Be specific with vendor names, cost ranges, and timelines. Address the split bet
         })
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `API error: ${response.status} ${response.statusText}`);
+      }
+
       const data = await response.json();
       const analysisText = data.content[0].text;
       setAnalysis(analysisText);
@@ -669,7 +682,8 @@ Be specific with vendor names, cost ranges, and timelines. Address the split bet
       setShowReport(true);
     } catch (error) {
       console.error("Error analyzing with Claude:", error);
-      setAnalysis("Error generating analysis. Please try again.");
+      setAnalysis(`# Error Generating Analysis\n\n${error.message}\n\nPlease check:\n- API key is configured correctly\n- You have sufficient API credits\n- Your internet connection is stable\n\nTry again or contact support if the issue persists.`);
+      setShowReport(true); // Show the error message to the user
     } finally {
       setLoading(false);
     }
