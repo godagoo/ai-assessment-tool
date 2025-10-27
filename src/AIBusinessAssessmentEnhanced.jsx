@@ -827,15 +827,15 @@ const AIBusinessAssessment = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          {analysis && (
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="prose max-w-none text-gray-700">
-                <MarkdownText>{analysis}</MarkdownText>
+            {analysis && (
+              <div className="mt-8">
+                <div className="prose max-w-none text-gray-700">
+                  <MarkdownText>{analysis}</MarkdownText>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     );
