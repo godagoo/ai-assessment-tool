@@ -11,9 +11,13 @@ const MarkdownText = ({ children }) => {
   if (!children) return null;
 
   const parseMarkdown = (text) => {
-    // First, extract and protect code blocks and HTML tables from processing
+    // Storage arrays for extracted content
     const codeBlocks = [];
     const htmlTables = [];
+    const markdownTables = [];
+
+    // === PHASE 1: EXTRACTION ===
+    // Extract to prevent interference during conversion
 
     // Extract code blocks (triple backticks)
     text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -29,7 +33,44 @@ const MarkdownText = ({ children }) => {
       return `__HTMLTABLE_${index}__`;
     });
 
-    // Convert markdown to HTML
+    // Extract and convert markdown tables
+    text = text.replace(/(\|.+\|[\r\n]+\|[-:\s|]+\|[\r\n]+(?:\|.+\|[\r\n]*)*)/g, (match) => {
+      const lines = match.trim().split('\n').filter(line => line.trim());
+      if (lines.length < 2) return match;
+
+      let tableHtml = '<table class="min-w-full border-collapse border border-gray-300 my-4 text-sm overflow-x-auto">';
+
+      // Parse header
+      const headerCells = lines[0].split('|').filter(cell => cell.trim()).map(cell => cell.trim());
+      tableHtml += '<thead><tr class="bg-indigo-100">';
+      headerCells.forEach(cell => {
+        tableHtml += `<th class="border border-gray-300 px-4 py-2 font-bold text-left">${cell}</th>`;
+      });
+      tableHtml += '</tr></thead>';
+
+      // Parse body
+      if (lines.length > 2) {
+        tableHtml += '<tbody>';
+        for (let i = 2; i < lines.length; i++) {
+          const cells = lines[i].split('|').filter(cell => cell.trim()).map(cell => cell.trim());
+          tableHtml += '<tr class="hover:bg-gray-50">';
+          cells.forEach(cell => {
+            tableHtml += `<td class="border border-gray-300 px-4 py-2">${cell}</td>`;
+          });
+          tableHtml += '</tr>';
+        }
+        tableHtml += '</tbody>';
+      }
+
+      tableHtml += '</table>';
+
+      const index = markdownTables.length;
+      markdownTables.push(tableHtml);
+      return `__MDTABLE_${index}__`;
+    });
+
+    // === PHASE 2: CONVERSION ===
+    // Convert remaining markdown syntax to HTML
     let html = text
       // Headers
       .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2 text-gray-900">$1</h3>')
@@ -37,20 +78,31 @@ const MarkdownText = ({ children }) => {
       .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4 text-gray-900">$1</h1>')
       // Horizontal rules
       .replace(/^---$/gim, '<hr class="my-6 border-gray-300"/>')
-      // Bold
+      // Bold and italic (process bold first to avoid conflicts)
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>')
-      // Italic
       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      // Bullet lists
-      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
-      // Numbered lists
-      .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1 list-decimal">$1</li>')
-      // Paragraphs (double newlines)
+      // Bullet lists - wrapped in <ul>
+      .replace(/((?:^[\-\*] .*$[\r\n]*)+)/gim, (match) => {
+        const items = match.split('\n').filter(line => line.trim()).map(line => {
+          return line.replace(/^[\-\*] (.*)$/, '<li class="mb-1">$1</li>');
+        }).join('');
+        return `<ul class="list-disc ml-6 mb-4">${items}</ul>`;
+      })
+      // Numbered lists - wrapped in <ol>
+      .replace(/((?:^\d+\. .*$[\r\n]*)+)/gim, (match) => {
+        const items = match.split('\n').filter(line => line.trim()).map(line => {
+          return line.replace(/^\d+\. (.*)$/, '<li class="mb-1">$1</li>');
+        }).join('');
+        return `<ol class="list-decimal ml-6 mb-4">${items}</ol>`;
+      })
+      // Paragraphs and line breaks
       .replace(/\n\n/g, '</p><p class="mb-4">')
-      // Single line breaks
       .replace(/\n/g, '<br/>');
 
-    // Restore code blocks with styling
+    // === PHASE 3: RESTORATION ===
+    // Restore extracted content with styling
+
+    // Restore code blocks
     codeBlocks.forEach((code, index) => {
       html = html.replace(
         `__CODEBLOCK_${index}__`,
@@ -58,9 +110,8 @@ const MarkdownText = ({ children }) => {
       );
     });
 
-    // Restore HTML tables with enhanced styling
+    // Restore HTML tables
     htmlTables.forEach((table, index) => {
-      // Add Tailwind classes to table elements
       const styledTable = table
         .replace(/<table/gi, '<table class="min-w-full border-collapse border border-gray-300 my-4 text-sm"')
         .replace(/<th/gi, '<th class="border border-gray-300 px-4 py-2 bg-indigo-100 font-bold text-left"')
@@ -69,7 +120,12 @@ const MarkdownText = ({ children }) => {
       html = html.replace(`__HTMLTABLE_${index}__`, styledTable);
     });
 
-    // Wrap in paragraph if not starting with a tag
+    // Restore markdown tables
+    markdownTables.forEach((table, index) => {
+      html = html.replace(`__MDTABLE_${index}__`, table);
+    });
+
+    // Wrap in paragraph if needed
     if (!html.startsWith('<')) {
       html = '<p class="mb-4">' + html + '</p>';
     }
