@@ -11,9 +11,10 @@ const MarkdownText = ({ children }) => {
   if (!children) return null;
 
   const parseMarkdown = (text) => {
-    // First, extract and protect code blocks and HTML tables from processing
+    // First, extract and protect code blocks, HTML tables, and markdown tables from processing
     const codeBlocks = [];
     const htmlTables = [];
+    const markdownTables = [];
 
     // Extract code blocks (triple backticks)
     text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -27,6 +28,46 @@ const MarkdownText = ({ children }) => {
       const index = htmlTables.length;
       htmlTables.push(match);
       return `__HTMLTABLE_${index}__`;
+    });
+
+    // Parse markdown tables (| header | format)
+    text = text.replace(/(\|.+\|[\r\n]+\|[-:\s|]+\|[\r\n]+(?:\|.+\|[\r\n]*)+)/g, (match) => {
+      const lines = match.trim().split('\n').map(l => l.trim());
+      if (lines.length < 3) return match; // Need at least header, separator, and one row
+
+      // Parse header row
+      const headers = lines[0].split('|').map(h => h.trim()).filter(h => h);
+
+      // Skip separator row (lines[1])
+
+      // Parse data rows
+      const rows = lines.slice(2).map(line =>
+        line.split('|').map(cell => cell.trim()).filter(cell => cell !== '')
+      );
+
+      // Build HTML table
+      let tableHtml = '<table class="min-w-full border-collapse border border-gray-300 my-4 text-sm">';
+      tableHtml += '<thead><tr>';
+      headers.forEach(header => {
+        tableHtml += `<th class="border border-gray-300 px-4 py-2 bg-indigo-100 font-bold text-left">${header}</th>`;
+      });
+      tableHtml += '</tr></thead><tbody>';
+
+      rows.forEach(row => {
+        if (row.length > 0) {
+          tableHtml += '<tr class="hover:bg-gray-50">';
+          row.forEach(cell => {
+            tableHtml += `<td class="border border-gray-300 px-4 py-2">${cell}</td>`;
+          });
+          tableHtml += '</tr>';
+        }
+      });
+
+      tableHtml += '</tbody></table>';
+
+      const index = markdownTables.length;
+      markdownTables.push(tableHtml);
+      return `__MARKDOWNTABLE_${index}__`;
     });
 
     // Convert markdown to HTML
@@ -50,6 +91,28 @@ const MarkdownText = ({ children }) => {
       // Single line breaks
       .replace(/\n/g, '<br/>');
 
+    // Wrap consecutive list items in proper <ul> or <ol> tags
+    html = html.replace(/(<li class="ml-6 mb-1 list-disc">.*?<\/li>)(?:<br\/>)?(?=<li class="ml-6 mb-1 list-disc">|$)/gs, '$1');
+    html = html.replace(/(<li class="ml-6 mb-1 list-decimal">.*?<\/li>)(?:<br\/>)?(?=<li class="ml-6 mb-1 list-decimal">|$)/gs, '$1');
+
+    // Wrap bullet lists
+    html = html.replace(/(<li class="ml-6 mb-1 list-disc">[\s\S]*?<\/li>)(?![\s]*<li class="ml-6 mb-1 list-disc">)/g, (match) => {
+      const items = match.match(/<li class="ml-6 mb-1 list-disc">[\s\S]*?<\/li>/g);
+      if (items && items.length > 0) {
+        return '<ul class="my-4">' + items.join('') + '</ul>';
+      }
+      return match;
+    });
+
+    // Wrap numbered lists
+    html = html.replace(/(<li class="ml-6 mb-1 list-decimal">[\s\S]*?<\/li>)(?![\s]*<li class="ml-6 mb-1 list-decimal">)/g, (match) => {
+      const items = match.match(/<li class="ml-6 mb-1 list-decimal">[\s\S]*?<\/li>/g);
+      if (items && items.length > 0) {
+        return '<ol class="my-4">' + items.join('') + '</ol>';
+      }
+      return match;
+    });
+
     // Restore code blocks with styling
     codeBlocks.forEach((code, index) => {
       html = html.replace(
@@ -67,6 +130,11 @@ const MarkdownText = ({ children }) => {
         .replace(/<td/gi, '<td class="border border-gray-300 px-4 py-2"')
         .replace(/<tr/gi, '<tr class="hover:bg-gray-50"');
       html = html.replace(`__HTMLTABLE_${index}__`, styledTable);
+    });
+
+    // Restore markdown tables
+    markdownTables.forEach((table, index) => {
+      html = html.replace(`__MARKDOWNTABLE_${index}__`, table);
     });
 
     // Wrap in paragraph if not starting with a tag
