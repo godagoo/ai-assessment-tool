@@ -35,8 +35,8 @@ const MarkdownText = ({ children }) => {
       .replace(/### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2 text-gray-900">$1</h3>')
       .replace(/## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3 text-gray-900">$1</h2>')
       .replace(/# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4 text-gray-900">$1</h1>')
-      // Horizontal rules
-      .replace(/^---$/gim, '<hr class="my-6 border-gray-300"/>')
+      // Remove horizontal rules to prevent visual splitting (just remove the line)
+      .replace(/^---$/gim, '')
       // Bold
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>')
       // Italic
