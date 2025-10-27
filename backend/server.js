@@ -142,13 +142,13 @@ CRITICAL CONTEXT:
 - These are DIFFERENT and both matter! Customer locations ADD compliance requirements.
 - AI Usage Type (ai_usage_type): Can include both "in_product" and "internal_productivity"
 
-FORMAT YOUR REPORT AS A PROFESSIONAL ENTERPRISE STRATEGY DOCUMENT:
+FORMAT YOUR REPORT EXACTLY AS SHOWN BELOW. USE PROPER MARKDOWN TABLES (with | symbols) FOR ALL TABLES.
 
 # AI IMPLEMENTATION STRATEGY
 ## Enterprise Deployment Roadmap
 
 **CONFIDENTIAL**
-Prepared for: [Client/Business Name based on responses]
+Prepared for: [Client Name based on responses]
 Date: ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
 
 ---
@@ -156,51 +156,66 @@ Date: ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' 
 ## EXECUTIVE SUMMARY
 
 ### Bottom Line Up Front
-Provide a 2-3 paragraph summary with:
-- Recommended strategic approach (dual-track, cloud-only, hybrid, etc.)
-- Total investment required (Year 1 and ongoing)
-- Payback period estimate
-- Key compliance coverage
-- Critical success factors (3-5 bullet points)
+
+Deploy a comprehensive AI strategy based on your business profile. This approach delivers [specific benefits] while maintaining regulatory compliance.
+
+**Key Findings:**
+- **Total Year 1 Investment:** $XX,000–XX,000
+- **Ongoing Annual Costs:** $XX,000–XX,000
+- **Payback Period:** X–X months through productivity gains
+- **Compliance Coverage:** [List relevant regulations]
+
+**Critical Success Factors:**
+1. [Factor 1]
+2. [Factor 2]
+3. [Factor 3]
+4. [Factor 4]
 
 ---
 
 ## 1. STRATEGIC RECOMMENDATIONS
 
-### 1.1 [Primary Recommendation Title Based on Use Case]
+### 1.1 [Recommendation Title Based on Customer Profile]
 
-Provide context-specific recommendations. Use ASCII diagrams where helpful:
+[Provide context-specific strategic guidance]
 
-**Example Architecture Diagram** (use similar format):
+**Exhibit 1: [Architecture/Strategy Name]**
+
 \`\`\`
 ┌─────────────────┐
-│  Customer Data  │
+│  [Component 1]  │
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│   AI Gateway    │
+│  [Component 2]  │
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│  AI Services    │
+│  [Component 3]  │
 └─────────────────┘
 \`\`\`
 
-**Investment Model Table** (use HTML tables):
+**Core Components:**
+- **[Component 1]:** [Description]
+- **[Component 2]:** [Description]
+- **[Component 3]:** [Description]
 
-<table>
-<tr><th>Cost Component</th><th>Year 1</th><th>Ongoing Annual</th><th>Notes</th></tr>
-<tr><td>AI Services</td><td>$XX,000</td><td>$XX,000</td><td>Usage-based</td></tr>
-<tr><td>Infrastructure</td><td>$XX,000</td><td>$XX,000</td><td>Cloud/gateway</td></tr>
-<tr><td>Compliance</td><td>$XX,000</td><td>$XX,000</td><td>Audits, legal</td></tr>
-<tr><td><strong>Total</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td><td></td></tr>
-</table>
+**Exhibit 2: Investment Model**
 
-### 1.2 [Secondary Recommendations if applicable]
+| Cost Component | Year 1 | Ongoing Annual | Notes |
+|----------------|--------|----------------|-------|
+| [Component] | $XX,000 | $XX,000 | [Details] |
+| [Component] | $XX,000 | $XX,000 | [Details] |
+| [Component] | $XX,000 | $XX,000 | [Details] |
+| **Total** | **$XX,000–XX,000** | **$XX,000–XX,000** | **[Notes]** |
 
-Continue with detailed sections...
+---
+
+### 1.2 [Additional Recommendations if applicable]
+
+[Continue with detailed sections as needed]
 
 ---
 
@@ -208,21 +223,32 @@ Continue with detailed sections...
 
 ### 2.1 Multi-Jurisdictional Requirements
 
-**Compliance Matrix:**
+**Critical Insight:** [Provide context-specific compliance guidance]
 
-<table>
-<tr><th>Your Status</th><th>Customer Location</th><th>Applicable Regulations</th><th>Key Requirements</th></tr>
-<tr><td>[Location]</td><td>[Regions]</td><td>[Laws]</td><td>[Requirements]</td></tr>
-</table>
+**Exhibit X: Jurisdictional Compliance Matrix**
+
+| Your Status | Customer Location | Applicable Regulations | Key Requirements |
+|-------------|-------------------|------------------------|------------------|
+| [Location] | [Region] | [Regulations] | [Requirements] |
+| [Location] | [Region] | [Regulations] | [Requirements] |
+| [Location] | [Region] | [Regulations] | [Requirements] |
+
+**Cross-Border Data Transfer Mechanisms:**
+- **[Region-Region]:** [Mechanism and details]
+- **[Region-Region]:** [Mechanism and details]
+
+---
 
 ### 2.2 Risk Assessment
 
-**Risk Matrix:**
+**Exhibit X: AI Implementation Risk Matrix**
 
-<table>
-<tr><th>Risk Category</th><th>Impact</th><th>Probability</th><th>Mitigation Strategy</th></tr>
-<tr><td>Data Breach</td><td>High/Med/Low</td><td>%</td><td>Specific actions</td></tr>
-</table>
+| Risk Category | [Use Case 1] | [Use Case 2] | Mitigation Strategy |
+|---------------|--------------|--------------|---------------------|
+| **Data Breach Impact** | **[Level]** | **[Level]** | [Strategy] |
+| **Regulatory Audit** | **[Level]** | **[Level]** | [Strategy] |
+| **Vendor Lock-in** | **[Level]** | **[Level]** | [Strategy] |
+| **Compliance Drift** | **[Level]** | **[Level]** | [Strategy] |
 
 ---
 
@@ -230,35 +256,81 @@ Continue with detailed sections...
 
 ### 3.1 Phased Deployment Strategy
 
-**Timeline Visualization:**
+**Design Principle:** [Describe the approach]
+
+**Exhibit X: [X]-Month Implementation Timeline**
 
 \`\`\`
-Month 1-2: FOUNDATION
-├─ Week 1-2: Initial setup
-├─ Week 3-4: Configuration
-└─ Week 5-8: Testing
-   Expected ROI: XX%
+Month 1-2: [PHASE NAME]
+├─ Week 1-2: [Activities]
+├─ Week 3-4: [Activities]
+├─ Week 5-6: [Activities]
+└─ Week 7-8: [Activities]
+   Expected ROI: [X]%
 
-Month 3-4: DEPLOYMENT
-├─ Week 1-2: Pilot launch
-└─ Week 3-4: Full rollout
+Month 3-4: [PHASE NAME]
+├─ Week 1-2: [Activities]
+├─ Week 3-4: [Activities]
+└─ Week 5-8: [Activities]
+   Expected Milestone: [Milestone]
+
+Month X-X: [PHASE NAME]
+├─ [Activities]
+└─ [Activities]
+   Expected Milestone: [Milestone]
 \`\`\`
+
+**Critical Path Items:**
+1. [Item] (X–X weeks)
+2. [Item] (X–X weeks)
+3. [Item] (X–X weeks)
+
+---
 
 ### 3.2 Immediate Action Plan
 
-**This Week/Month breakdown with specific tasks**
+**This Month (Week-by-Week):**
+
+**Week 1:**
+- [Action items]
+- Success metric: [Metric]
+
+**Week 2:**
+- [Action items]
+- Success metric: [Metric]
+
+**Week 3:**
+- [Action items]
+- Success metric: [Metric]
 
 ---
 
 ## 4. VENDOR RECOMMENDATIONS
 
-**Recommended Vendor Configuration:**
+### 4.1 [Use Case] AI Stack
 
-<table>
-<tr><th>Layer</th><th>Primary Recommendation</th><th>Alternative</th><th>Rationale</th></tr>
-<tr><td>AI Provider</td><td>[Vendor + Region]</td><td>[Alternative]</td><td>[Why]</td></tr>
-<tr><td>Security Layer</td><td>[Tool]</td><td>[Alt]</td><td>[Reason]</td></tr>
-</table>
+**Exhibit X: Recommended Vendor Configuration**
+
+| Layer | Primary Recommendation | Alternative | Rationale |
+|-------|------------------------|-------------|-----------|
+| **[Layer]** | [Vendor] ($X/month) | [Alternative] ($X/month) | [Reason] |
+| **[Layer]** | [Vendor] | [Alternative] | [Reason] |
+| **Avoid** | [Vendor] | — | [Reason] |
+
+**Key Selection Criteria:**
+1. **[Criteria]:** [Details]
+2. **[Criteria]:** [Details]
+
+---
+
+### 4.2 [Additional Vendor Section if needed]
+
+**Exhibit X: Vendor Matrix**
+
+| Use Case | Primary Solution | Cost/User/Month | Alternative |
+|----------|------------------|-----------------|-------------|
+| **[Use Case]** | [Solution] | $XX | [Alternative] |
+| **[Use Case]** | [Solution] | $XX | [Alternative] |
 
 ---
 
@@ -266,20 +338,36 @@ Month 3-4: DEPLOYMENT
 
 ### 5.1 Total Cost of Ownership (3-Year Projection)
 
-<table>
-<tr><th>Cost Category</th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>3-Year Total</th></tr>
-<tr><td>AI Services</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td></tr>
-<tr><td>Infrastructure</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td><td>$XX,000</td></tr>
-<tr><td><strong>Total</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td><td><strong>$XX,000</strong></td></tr>
-</table>
+**Exhibit X: Three-Year TCO Model**
+
+| Cost Category | Year 1 | Year 2 | Year 3 | 3-Year Total |
+|---------------|--------|--------|--------|--------------|
+| **[Category]** |
+| [Item] | $XX,000 | $XX,000 | $XX,000 | $XX,000 |
+| [Item] | $XX,000 | $XX,000 | $XX,000 | $XX,000 |
+| **Subtotal** | **$XX,000** | **$XX,000** | **$XX,000** | **$XX,000** |
+| **[Category]** |
+| [Item] | $XX,000 | $XX,000 | $XX,000 | $XX,000 |
+| [Item] | $XX,000 | $XX,000 | $XX,000 | $XX,000 |
+| **Subtotal** | **$XX,000** | **$XX,000** | **$XX,000** | **$XX,000** |
+| **Grand Total** | **$XX,000** | **$XX,000** | **$XX,000** | **$XX,000** |
+
+**Key Assumptions:**
+- [Assumption 1]
+- [Assumption 2]
+
+---
 
 ### 5.2 Return on Investment
 
-**ROI Analysis:**
-- Break-even timeline
-- Productivity gains
-- Cost avoidance
-- Value drivers
+**Exhibit X: Productivity Gains vs. Investment**
+
+| Metric | [Use Case 1] | [Use Case 2] | Combined |
+|--------|--------------|--------------|----------|
+| **Year 1 Investment** | $XX,000 | $XX,000 | $XX,000 |
+| **Productivity Gain** | [%] time savings | [%] improvement | $XX,000 value |
+| **ROI Timeline** | X–X months | X–X months | X–X months |
+| **Break-Even Point** | QX | QX | QX |
 
 ---
 
@@ -287,29 +375,63 @@ Month 3-4: DEPLOYMENT
 
 ### 6.1 Critical Success Factors
 
-<table>
-<tr><th>Risk</th><th>Impact</th><th>Probability</th><th>Mitigation Strategy</th></tr>
-</table>
+**Exhibit X: Top 5 Implementation Risks & Mitigations**
+
+| Risk | Impact | Probability | Mitigation Strategy |
+|------|--------|-------------|---------------------|
+| **1. [Risk]** | [Impact] | [Level] | [Strategy] |
+| **2. [Risk]** | [Impact] | [Level] | [Strategy] |
+| **3. [Risk]** | [Impact] | [Level] | [Strategy] |
+| **4. [Risk]** | [Impact] | [Level] | [Strategy] |
+| **5. [Risk]** | [Impact] | [Level] | [Strategy] |
+
+---
 
 ### 6.2 Common Pitfalls to Avoid
 
-List critical mistakes with specific solutions
+**Critical Mistakes:**
+
+1. **[Mistake]**
+   - **Issue:** [Description]
+   - **Solution:** [Description]
+
+2. **[Mistake]**
+   - **Issue:** [Description]
+   - **Solution:** [Description]
+
+**Budget Reality Checks:**
+- **Don't:** [What not to do]
+- **Do:** [What to do instead]
 
 ---
 
 ## 7. CONCLUSION
 
 ### Bottom Line
-Restate key recommendations and next actions.
+
+[Provide comprehensive summary and strategic guidance]
+
+**Key Takeaways:**
+
+1. **[Takeaway 1]:** [Details]
+2. **[Takeaway 2]:** [Details]
+3. **[Takeaway 3]:** [Details]
+4. **[Takeaway 4]:** [Details]
+5. **[Takeaway 5]:** [Details]
 
 **Recommended Next Action:**
-Specific immediate next step with budget/timeline.
+[Specific immediate action with budget and timeline]
+
+---
+
+**This report prepared by AI Business Assessment Tool**
+**For questions or implementation support, contact: [relevant contact]**
 
 ---
 
 ## DISCLAIMER
 
-**IMPORTANT: This report is provided for informational and inspirational purposes only.**
+**IMPORTANT: This report is provided for informational and educational purposes only.**
 
 This AI implementation strategy report is a general assessment based on the information provided and should NOT be considered:
 - Legal advice or a substitute for consultation with qualified legal counsel
@@ -330,23 +452,23 @@ The strategies, costs, and timelines presented are estimates based on typical sc
 
 ---
 
-*Report generated on ${new Date().toISOString().split('T')[0]}*
+*Confidential and Proprietary – Not for Distribution*
 
 ---
 
-INSTRUCTIONS FOR GENERATING THIS REPORT:
-1. Use the EXACT structure above
-2. Fill in all sections with specific, actionable recommendations based on the assessment data
-3. Use HTML tables for all tabular data (they render properly)
-4. Use ASCII diagrams for architecture/flow visualizations
-5. Include specific vendor names, cost ranges ($XX,000 format), and timelines
-6. Address the business location vs customer location distinction explicitly
-7. Make tables with realistic numbers based on the user's profile
-8. Keep disclaimers prominent and clear
-9. Be specific about risks for their industry/compliance requirements
-10. Provide immediate actionable next steps
+CRITICAL INSTRUCTIONS:
+1. Use the EXACT structure above with all section numbers and headings
+2. ALL TABLES must use Markdown table format with | symbols (NOT HTML)
+3. Use ASCII diagrams for architecture/flow visualizations within code blocks
+4. Fill in [placeholders] with specific, actionable recommendations based on assessment data
+5. Use "Exhibit X:" format for all tables and figures
+6. Include specific vendor names, cost ranges ($XX,000 format), and realistic timelines
+7. Address the business location vs customer location distinction explicitly
+8. Make tables comprehensive with realistic numbers based on the user's profile
+9. Use currency symbols appropriate to their region ($ for US/Canada, € for EU, £ for UK)
+10. Provide immediate actionable next steps tailored to their situation
 
-Generate a complete, professional report following this structure exactly.`;
+Generate a complete, professional report following this structure EXACTLY. Every table MUST use Markdown format (| symbols).`;
 
     let analysisText;
     let inputTokens = 0;

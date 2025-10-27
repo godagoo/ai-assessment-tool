@@ -11,9 +11,10 @@ const MarkdownText = ({ children }) => {
   if (!children) return null;
 
   const parseMarkdown = (text) => {
-    // First, extract and protect code blocks and HTML tables from processing
+    // First, extract and protect code blocks, HTML tables, and Markdown tables from processing
     const codeBlocks = [];
     const htmlTables = [];
+    const markdownTables = [];
 
     // Extract code blocks (triple backticks)
     text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -27,6 +28,52 @@ const MarkdownText = ({ children }) => {
       const index = htmlTables.length;
       htmlTables.push(match);
       return `__HTMLTABLE_${index}__`;
+    });
+
+    // Extract and convert Markdown tables
+    // Match tables that have pipes | and separator lines
+    text = text.replace(/\n(\|.+\|)\n(\|[-:\s|]+\|)\n((?:\|.+\|\n?)+)/g, (match, header, separator, rows) => {
+      const index = markdownTables.length;
+
+      // Parse header
+      const headerCells = header.split('|').filter(cell => cell.trim()).map(cell => cell.trim());
+
+      // Parse rows
+      const rowsArray = rows.trim().split('\n').map(row =>
+        row.split('|').filter(cell => cell.trim()).map(cell => cell.trim())
+      );
+
+      // Build HTML table with beautiful styling
+      let tableHtml = '<div class="overflow-x-auto my-6"><table class="min-w-full border-collapse border-2 border-gray-300 shadow-sm">';
+
+      // Add header
+      tableHtml += '<thead class="bg-gradient-to-r from-indigo-100 to-indigo-50">';
+      tableHtml += '<tr>';
+      headerCells.forEach(cell => {
+        // Check if cell contains ** for bold
+        const cellContent = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        tableHtml += `<th class="border border-gray-300 px-4 py-3 text-left font-bold text-gray-900 text-sm">${cellContent}</th>`;
+      });
+      tableHtml += '</tr>';
+      tableHtml += '</thead>';
+
+      // Add body
+      tableHtml += '<tbody>';
+      rowsArray.forEach((row, rowIndex) => {
+        const bgClass = rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        tableHtml += `<tr class="${bgClass} hover:bg-indigo-50 transition-colors">`;
+        row.forEach(cell => {
+          // Check if cell contains ** for bold
+          const cellContent = cell.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
+          tableHtml += `<td class="border border-gray-300 px-4 py-2 text-sm text-gray-700">${cellContent}</td>`;
+        });
+        tableHtml += '</tr>';
+      });
+      tableHtml += '</tbody>';
+      tableHtml += '</table></div>';
+
+      markdownTables.push(tableHtml);
+      return `\n__MARKDOWNTABLE_${index}__\n`;
     });
 
     // Convert markdown to HTML
@@ -67,6 +114,11 @@ const MarkdownText = ({ children }) => {
         .replace(/<td/gi, '<td class="border border-gray-300 px-4 py-2"')
         .replace(/<tr/gi, '<tr class="hover:bg-gray-50"');
       html = html.replace(`__HTMLTABLE_${index}__`, styledTable);
+    });
+
+    // Restore Markdown tables
+    markdownTables.forEach((table, index) => {
+      html = html.replace(`__MARKDOWNTABLE_${index}__`, table);
     });
 
     // Wrap in paragraph if not starting with a tag
