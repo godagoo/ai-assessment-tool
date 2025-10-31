@@ -83,7 +83,7 @@ const MarkdownText = ({ children }) => {
       // Italic
       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
       // Bullet lists
-      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
+      .replace(/^- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
       // Numbered lists
       .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1 list-decimal">$1</li>')
       // Paragraphs (double newlines)
@@ -481,6 +481,7 @@ const AIBusinessAssessment = () => {
         content: (() => {
           const dataTypes = responses.data_sensitivity || [];
           const compliance = responses.compliance || [];
+          // eslint-disable-next-line no-unused-vars
           const industries = responses.industry || [];
           const aiTypes = responses.ai_usage_type || [];
 
@@ -547,6 +548,7 @@ const AIBusinessAssessment = () => {
       const context = getQuestionContext(currentQuestion.id);
       setContextHelp(context);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, responses]);
 
   // Fetch available providers on mount
