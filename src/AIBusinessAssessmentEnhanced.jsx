@@ -83,7 +83,7 @@ const MarkdownText = ({ children }) => {
       // Italic
       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
       // Bullet lists
-      .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
+      .replace(/^- (.*$)/gim, '<li class="ml-6 mb-1 list-disc">$1</li>')
       // Numbered lists
       .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-1 list-decimal">$1</li>')
       // Paragraphs (double newlines)
@@ -336,7 +336,6 @@ const AIBusinessAssessment = () => {
       compliance: {
         title: "⚖️ Understanding Your Compliance Requirements",
         content: (() => {
-          const industries = responses.industry || [];
           const businessLoc = responses.business_location;
           const customerLocs = responses.customer_locations || [];
           const dataTypes = responses.data_sensitivity || [];
@@ -547,7 +546,7 @@ const AIBusinessAssessment = () => {
       const context = getQuestionContext(currentQuestion.id);
       setContextHelp(context);
     }
-  }, [currentStep, responses]);
+  }, [currentStep, responses, getQuestionContext, questions]);
 
   // Fetch available providers on mount
   useEffect(() => {
